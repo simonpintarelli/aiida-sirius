@@ -14,7 +14,7 @@ from voluptuous import Optional, Schema
 from aiida.orm import Dict
 
 # A subset of sirius.scf's command line options
-cmdline_options = {Required("sirius_json"): str, Optional("output"): str}
+cmdline_options = {Optional("sirius_json"): str, Optional("output"): str}
 
 
 class SiriusParameters(Dict):

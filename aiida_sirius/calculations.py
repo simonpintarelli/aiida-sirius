@@ -11,6 +11,7 @@ from aiida.common import datastructures
 from aiida.engine import CalcJob
 from aiida.orm import SinglefileData
 from aiida.plugins import DataFactory
+import os
 
 SiriusParameters = DataFactory('sirius')
 
@@ -31,6 +32,7 @@ class SiriusCalculation(CalcJob):
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius')
         spec.input('metadata.options.output_filename', valid_type=six.string_types, default='output.json')
         spec.input('sirius_config', valid_type=SinglefileData, help='sirius.json config')
+        spec.input('parameters', valid_type=SiriusParameters, help='Command line parameters for sirius.scf')
         spec.output('sirius', valid_type=SinglefileData, help='diff between file1 and file2.')
 
         spec.exit_code(100, 'ERROR_MISSING_OUTPUT_FILES', message='Calculation did not produce all expected output files.')
@@ -45,18 +47,17 @@ class SiriusCalculation(CalcJob):
         :return: `aiida.common.datastructures.CalcInfo` instance
         """
         codeinfo = datastructures.CodeInfo()
-        codeinfo.cmdline_params = self.inputs.parameters.cmdline_params(
-            file1_name=self.inputs.file1.filename,
-            file2_name=self.inputs.file2.filename)
+        codeinfo.cmdline_params = ['--output=output.json']
         codeinfo.code_uuid = self.inputs.code.uuid
         codeinfo.stdout_name = self.metadata.options.output_filename
         codeinfo.withmpi = self.inputs.metadata.options.withmpi
-
+        print('input: ', self.inputs.sirius_config.filename)
         # Prepare a `CalcInfo` to be returned to the engine
         calcinfo = datastructures.CalcInfo()
         calcinfo.codes_info = [codeinfo]
+        relpath = os.path.basename(self.inputs.sirius_config.filename)
         calcinfo.local_copy_list = [
-            (self.inputs.sirius_config.uuid, self.inputs.sirius_config.filename, self.inputs.sirius_config.filename)
+            (self.inputs.sirius_config.uuid, self.inputs.sirius_config.filename, 'sirius.json')
         ]
         calcinfo.retrieve_list = [self.metadata.options.output_filename]
 
