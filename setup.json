@@ -1,0 +1,53 @@
+{
+    "name": "aiida-sirius",
+    "author": "Simon Pintarelli",
+    "author_email": "simon.pintarelli@cscs.ch",
+    "description": "AiiDA plugin for the SIRIUS library",
+    "url": "https://github.com/simonpintarelli/aiida-sirius",
+    "license": "MIT",
+    "classifiers": [
+        "Programming Language :: Python",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Framework :: AiiDA"
+    ],
+    "version": "0.1.0a0",
+    "entry_points": {
+        "aiida.data": [
+            "sirius = aiida_sirius.data:SiriusParameters"
+        ],
+        "aiida.calculations": [
+            "sirius = aiida_sirius.calculations:SiriusCalculation"
+        ],
+        "aiida.parsers": [
+            "sirius = aiida_sirius.parsers:SiriusParser"
+        ]
+    },
+    "include_package_data": true,
+    "setup_requires": ["reentry"],
+    "reentry_register": true,
+    "install_requires": [
+        "aiida-core>=1.0.0b4,<2.0.0",
+        "six",
+        "voluptuous"
+    ],
+    "extras_require": {
+        "testing": [
+            "pgtest==1.2.0",
+            "wheel>=0.31",
+            "coverage",
+            "pytest>=3.6.3,<5.0.0",
+            "pytest-cov>=2.6.1,<5.0.0"
+        ],
+        "pre-commit": [
+            "pre-commit==1.11.0",
+            "yapf==0.27.0",
+            "prospector==0.12.11",
+            "pylint==1.9.4"
+        ],
+        "docs": [
+            "sphinx"
+        ]
+    }
+}
