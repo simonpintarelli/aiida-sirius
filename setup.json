@@ -2,6 +2,11 @@
     "name": "aiida-sirius",
     "author": "Simon Pintarelli",
     "author_email": "simon.pintarelli@cscs.ch",
+    "classifiers": [
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.6",
+        "Development Status :: 4 - Beta"
+    ],
     "description": "AiiDA plugin for the SIRIUS library",
     "url": "https://github.com/simonpintarelli/aiida-sirius",
     "license": "MIT",
@@ -18,7 +23,7 @@
             "sirius = aiida_sirius.data:SiriusParameters"
         ],
         "aiida.calculations": [
-            "sirius = aiida_sirius.calculations:SiriusCalculation"
+            "sirius.scf = aiida_sirius.calculations:SiriusCalculation"
         ],
         "aiida.parsers": [
             "sirius = aiida_sirius.parsers:SiriusParser"

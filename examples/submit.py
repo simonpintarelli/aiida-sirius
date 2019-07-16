@@ -15,7 +15,7 @@ import json
 
 # get code
 computer = helpers.get_computer()
-code = helpers.get_code(entry_point='sirius', computer=computer)
+code = helpers.get_code(entry_point='sirius.scf', computer=computer)
 
 # Prepare input parameters
 SiriusParameters = DataFactory('sirius')
