@@ -25,14 +25,14 @@ def data_cli():
 @decorators.with_dbenv()
 def list_():  # pylint: disable=redefined-builtin
     """
-    Display all DiffParameters nodes
+    Display all SiriusParameters nodes
     """
     from aiida.orm import QueryBuilder
     from aiida.plugins import DataFactory
-    DiffParameters = DataFactory('sirius')
+    SiriusParameters = DataFactory('sirius')
 
     qb = QueryBuilder()
-    qb.append(DiffParameters)
+    qb.append(SiriusParameters)
     results = qb.all()
 
     s = ""
