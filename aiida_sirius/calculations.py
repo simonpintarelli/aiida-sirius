@@ -16,13 +16,14 @@ import six
 from aiida.common import datastructures
 from aiida.common.constants import bohr_to_ang
 from aiida.engine import CalcJob
-from aiida.orm import SinglefileData, StructureData, UpfData
+from aiida.orm import StructureData, UpfData
 from aiida.plugins import DataFactory
 import tempfile
 
 from .upf_to_json import upf_to_json
 
 SiriusParameters = DataFactory('sirius.scf')
+SinglefileData = DataFactory('singlefile')
 
 SIRIUS_JSON = {
     "control": {
@@ -101,7 +102,7 @@ def read_structure(structure):
     return cell, atomic_coordinates
 
 
-class SiriusCalculation(CalcJob):
+class SiriusBaseCalculation(CalcJob):
     """
     AiiDA calculation plugin wrapping the diff executable.
 
@@ -112,7 +113,7 @@ class SiriusCalculation(CalcJob):
     def define(cls, spec):
         """Define inputs and outputs of the calculation."""
         # yapf: disable
-        super(SiriusCalculation, cls).define(spec)
+        super(SiriusBaseCalculation, cls).define(spec)
         spec.input('metadata.options.resources', valid_type=dict, default={'num_machines': 1, 'num_mpiprocs_per_machine': 1})
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.scf')
         spec.input('metadata.options.output_filename', valid_type=six.string_types, default='output.json')
@@ -123,6 +124,29 @@ class SiriusCalculation(CalcJob):
         spec.output('sirius', valid_type=SinglefileData, help='standard output')
         spec.exit_code(100, 'ERROR_MISSING_OUTPUT_FILES', message='Calculation did not produce all expected output files.')
 
+    def _read_pseudos(self, sirius_json):
+        # parse pseudos
+        for atom_label in self.inputs.pseudos:
+            upf = self.inputs.pseudos[atom_label]
+            with upf.open() as fh:
+                upf_json = upf_to_json(fh.read(), fname=upf.filename)
+            sirius_json['unit_cell']['atom_files'][atom_label] = json.dumps(upf_json)
+        return sirius_json
+
+
+class SiriusSCFCalculation(SiriusBaseCalculation):
+    """
+    AiiDA calculation plugin wrapping the diff executable.
+
+    Simple AiiDA plugin wrapper for 'diffing' two files.
+    """
+
+    @classmethod
+    def define(cls, spec):
+        """Define inputs and outputs of the calculation."""
+        # yapf: disable
+        super(SiriusSCFCalculation, cls).define(spec)
+
     def prepare_for_submission(self, folder):
         """
         Create input files.
@@ -132,7 +156,8 @@ class SiriusCalculation(CalcJob):
         :return: `aiida.common.datastructures.CalcInfo` instance
         """
         codeinfo = datastructures.CodeInfo()
-        codeinfo.cmdline_params = ['--output=output.json']
+        output_filename = self.metadata.options.output_filename
+        codeinfo.cmdline_params = ['--output=%s' % output_filename]
         codeinfo.code_uuid = self.inputs.code.uuid
         codeinfo.stdout_name = self.metadata.options.output_filename
         codeinfo.withmpi = self.inputs.metadata.options.withmpi
@@ -140,20 +165,14 @@ class SiriusCalculation(CalcJob):
         # with config from input
         structure = self.inputs.structure
         sirius_json = make_sirius_json(structure)
-        # parse pseudos
-        for atom_label in self.inputs.pseudos:
-            upf = self.inputs.pseudos[atom_label]
-            with upf.open() as fh:
-                upf_json = upf_to_json(fh.read(), fname=upf.filename)
-                sirius_json['unit_cell']['atom_files'][atom_label] = json.dumps(upf_json)
-
-        sirius_tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.json')
-        # merge with settings given from outside
-        sirius_json = {**sirius_json, **self.inputs.sirius_config.get_dict()}
-        # dump to file
-        json.dump(sirius_json, sirius_tmpfile)
-
-        sirius_config = SinglefileData(file=sirius_tmpfile.name)
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as sirius_tmpfile:
+            sirius_json = self._read_pseudos(sirius_json)
+            sirius_tmpfile_name = sirius_tmpfile.name
+            # merge with settings given from outside
+            sirius_json = {**sirius_json, **self.inputs.sirius_config.get_dict()}
+            # dump to file
+            json.dump(sirius_json, sirius_tmpfile)
+        sirius_config = SinglefileData(file=sirius_tmpfile_name)
         sirius_config.store()
 
         # Prepare a `CalcInfo` to be returned to the engine

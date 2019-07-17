@@ -23,7 +23,7 @@
             "sirius.scf = aiida_sirius.data:SiriusParameters"
         ],
         "aiida.calculations": [
-            "sirius.scf = aiida_sirius.calculations:SiriusCalculation"
+            "sirius.scf = aiida_sirius.calculations:SiriusSCFCalculation"
         ],
         "aiida.parsers": [
             "sirius.scf = aiida_sirius.parsers:SiriusParser"

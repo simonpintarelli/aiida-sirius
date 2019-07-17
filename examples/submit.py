@@ -17,11 +17,24 @@ import json
 computer = helpers.get_computer()
 code = helpers.get_code(entry_point='sirius.scf', computer=computer)
 
+params = {
+        "electronic_structure_method": "pseudopotential",
+        "xc_functionals": ["XC_GGA_X_PBE", "XC_GGA_C_PBE"],
+        "smearing_width": 0.025,
+        "use_symmetry": True,
+        "num_mag_dims": 1,
+        "gk_cutoff": 6.0,
+        "pw_cutoff": 27.00,
+        "num_dft_iter": 100,
+        "ngridk": [1, 1, 1],
+}
 # Prepare input parameters
 SiriusParameters = DataFactory('sirius.scf')
 StructureData = DataFactory('structure')
 parameters = SiriusParameters({'control': {},
-                               'iterative_solver': {}})
+                               'iterative_solver': {},
+                               'parameters': params,
+                               'mixer': {}})
 SinglefileData = DataFactory('singlefile')
 
 
