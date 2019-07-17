@@ -17,6 +17,9 @@ import json
 computer = helpers.get_computer()
 code = helpers.get_code(entry_point='sirius.scf', computer=computer)
 
+
+# this will fail because the pw-cutoff is too small.
+
 params = {
         "electronic_structure_method": "pseudopotential",
         "xc_functionals": ["XC_GGA_X_PBE", "XC_GGA_C_PBE"],
@@ -24,7 +27,7 @@ params = {
         "use_symmetry": True,
         "num_mag_dims": 1,
         "gk_cutoff": 6.0,
-        "pw_cutoff": 27.00,
+        "pw_cutoff": 7.00,
         "num_dft_iter": 100
 }
 # Prepare input parameters

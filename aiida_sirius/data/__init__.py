@@ -27,6 +27,7 @@ sirius_options = {
         Optional("electronic_structure_method", default="pseudopotential"): Any(
             "pseudopotential", "full_potential_lapwlo"
         ),
+        # TODO: add list of valid functionals
         Optional("xc_functionals"): All([str], Length(min=1, max=30)),
         Optional("vwd_functional"): All([str], Length(min=1, max=30)),
         Optional("core_relativity", default="dirac"): Any("dirac", "none"),

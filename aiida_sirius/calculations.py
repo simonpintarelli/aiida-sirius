@@ -24,6 +24,7 @@ from .upf_to_json import upf_to_json
 
 SiriusParameters = DataFactory('sirius.scf')
 SinglefileData = DataFactory('singlefile')
+KpointsData = DataFactory('array.kpoints')
 
 SIRIUS_JSON = {
     "control": {
@@ -43,7 +44,6 @@ SIRIUS_JSON = {
         "energy_tol": 1e-8,
         "potential_tol": 1e-8,
         "num_dft_iter": 100,
-        "ngridk": "None"
     },
     "iterative_solver": {
         "type": "davidson",
@@ -65,7 +65,7 @@ SIRIUS_JSON = {
 }
 
 
-def make_sirius_json(structure):
+def make_sirius_json(structure, kpoints):
     """
     Keyword Arguments:
     structure -- structure
@@ -76,6 +76,8 @@ def make_sirius_json(structure):
     sirius_json['unit_cell']['lattice_vectors'] = sirius_cell
     sirius_json['unit_cell']['atom_types'] = list(sirius_pos.keys())
     sirius_json['unit_cell']['atoms'] = sirius_pos
+    sirius_json['parameters']['ngridk'] = kpoints.attributes['mesh']
+    sirius_json['parameters']['shiftk'] = kpoints.attributes['offset']
 
     return sirius_json
 
@@ -118,6 +120,7 @@ class SiriusBaseCalculation(CalcJob):
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.scf')
         spec.input('metadata.options.output_filename', valid_type=six.string_types, default='output.json')
         spec.input('structure', valid_type=StructureData, help='The input structure')
+        spec.input('kpoints', valid_type=KpointsData, help='kpoints')
         spec.input('sirius_config', valid_type=SiriusParameters, help='sirius parameters')
         spec.input_namespace('pseudos', valid_type=UpfData, dynamic=True,
                              help='A mapping of `UpfData` nodes onto the kind name to which they should apply.')
@@ -164,7 +167,8 @@ class SiriusSCFCalculation(SiriusBaseCalculation):
 
         # with config from input
         structure = self.inputs.structure
-        sirius_json = make_sirius_json(structure)
+        kpoints = self.inputs.kpoints
+        sirius_json = make_sirius_json(structure, kpoints)
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as sirius_tmpfile:
             sirius_json = self._read_pseudos(sirius_json)
             sirius_tmpfile_name = sirius_tmpfile.name
