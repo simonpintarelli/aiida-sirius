@@ -15,7 +15,7 @@ import tempfile
 LOCALHOST_NAME = 'localhost-test'
 
 executables = {
-    'sirius': 'sirius.scf',
+    'sirius.scf': 'sirius.scf',
 }
 
 

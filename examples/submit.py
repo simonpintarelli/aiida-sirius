@@ -18,7 +18,7 @@ computer = helpers.get_computer()
 code = helpers.get_code(entry_point='sirius.scf', computer=computer)
 
 # Prepare input parameters
-SiriusParameters = DataFactory('sirius')
+SiriusParameters = DataFactory('sirius.scf')
 StructureData = DataFactory('structure')
 parameters = SiriusParameters({'control': {},
                                'iterative_solver': {}})
@@ -51,7 +51,7 @@ inputs = {
 # Note: in order to submit your calculation to the aiida daemon, do:
 # from aiida.engine import submit
 # future = submit(CalculationFactory('sirius'), **inputs)
-result = run(CalculationFactory('sirius'), **inputs)
+result = run(CalculationFactory('sirius.scf'), **inputs)
 
 res = result['sirius'].get_content()
 print("Result: \n{}".format(res))

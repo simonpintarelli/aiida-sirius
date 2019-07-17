@@ -1,5 +1,5 @@
 """
-For pytest 
+For pytest
 initialise a text database and profile
 """
 from __future__ import absolute_import
@@ -55,6 +55,6 @@ def aiida_code(aiida_localhost_computer):
     """
     from aiida_sirius.helpers import get_code
 
-    code = get_code(entry_point='sirius', computer=aiida_localhost_computer)
+    code = get_code(entry_point='sirius.scf', computer=aiida_localhost_computer)
 
     return code

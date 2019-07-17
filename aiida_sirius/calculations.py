@@ -22,8 +22,7 @@ import tempfile
 
 from .upf_to_json import upf_to_json
 
-SiriusParameters = DataFactory('sirius')
-Dict = DataFactory('dict')
+SiriusParameters = DataFactory('sirius.scf')
 
 SIRIUS_JSON = {
     "control": {
@@ -115,7 +114,7 @@ class SiriusCalculation(CalcJob):
         # yapf: disable
         super(SiriusCalculation, cls).define(spec)
         spec.input('metadata.options.resources', valid_type=dict, default={'num_machines': 1, 'num_mpiprocs_per_machine': 1})
-        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius')
+        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.scf')
         spec.input('metadata.options.output_filename', valid_type=six.string_types, default='output.json')
         spec.input('structure', valid_type=StructureData, help='The input structure')
         spec.input('sirius_config', valid_type=SiriusParameters, help='sirius parameters')
@@ -123,7 +122,6 @@ class SiriusCalculation(CalcJob):
                              help='A mapping of `UpfData` nodes onto the kind name to which they should apply.')
         spec.output('sirius', valid_type=SinglefileData, help='standard output')
         spec.exit_code(100, 'ERROR_MISSING_OUTPUT_FILES', message='Calculation did not produce all expected output files.')
-
 
     def prepare_for_submission(self, folder):
         """
@@ -149,10 +147,8 @@ class SiriusCalculation(CalcJob):
                 upf_json = upf_to_json(fh.read(), fname=upf.filename)
                 sirius_json['unit_cell']['atom_files'][atom_label] = json.dumps(upf_json)
 
-        # create json file and store it as SinglefileData, TODO: provenance is missing here (or duplicated)
         sirius_tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.json')
         # merge with settings given from outside
-        print('the dict:', self.inputs.sirius_config.get_dict())
         sirius_json = {**sirius_json, **self.inputs.sirius_config.get_dict()}
         # dump to file
         json.dump(sirius_json, sirius_tmpfile)

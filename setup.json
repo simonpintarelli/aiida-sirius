@@ -20,13 +20,13 @@
     "version": "0.1.0a0",
     "entry_points": {
         "aiida.data": [
-            "sirius = aiida_sirius.data:SiriusParameters"
+            "sirius.scf = aiida_sirius.data:SiriusParameters"
         ],
         "aiida.calculations": [
             "sirius.scf = aiida_sirius.calculations:SiriusCalculation"
         ],
         "aiida.parsers": [
-            "sirius = aiida_sirius.parsers:SiriusParser"
+            "sirius.scf = aiida_sirius.parsers:SiriusParser"
         ]
     },
     "include_package_data": true,

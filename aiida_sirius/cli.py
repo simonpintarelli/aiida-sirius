@@ -15,7 +15,7 @@ from aiida.cmdline.params.types import DataParamType
 
 
 # See aiida.cmdline.data entry point in setup.json
-@verdi_data.group('sirius')
+@verdi_data.group('sirius.scf')
 def data_cli():
     """Command line interface for aiida-sirius"""
     pass
@@ -29,7 +29,7 @@ def list_():  # pylint: disable=redefined-builtin
     """
     from aiida.orm import QueryBuilder
     from aiida.plugins import DataFactory
-    SiriusParameters = DataFactory('sirius')
+    SiriusParameters = DataFactory('sirius.scf')
 
     qb = QueryBuilder()
     qb.append(SiriusParameters)

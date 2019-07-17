@@ -10,7 +10,7 @@ from aiida.engine import ExitCode
 from aiida.parsers.parser import Parser
 from aiida.plugins import CalculationFactory
 
-SiriusCalculation = CalculationFactory('sirius')
+SiriusCalculation = CalculationFactory('sirius.scf')
 
 
 class SiriusParser(Parser):
@@ -22,7 +22,7 @@ class SiriusParser(Parser):
         """
         Initialize Parser instance
 
-        Checks that the ProcessNode being passed was produced by a DiffCalculation.
+        Checks that the ProcessNode being passed was produced by a SiriusCalculation.
 
         :param node: ProcessNode of calculation
         :param type node: :class:`aiida.orm.ProcessNode`
@@ -30,7 +30,7 @@ class SiriusParser(Parser):
         from aiida.common import exceptions
         super(SiriusParser, self).__init__(node)
         if not issubclass(node.process_class, SiriusCalculation):
-            raise exceptions.ParsingError("Can only parse DiffCalculation")
+            raise exceptions.ParsingError("Can only parse SiriusCalculation")
 
     def parse(self, **kwargs):
         """
