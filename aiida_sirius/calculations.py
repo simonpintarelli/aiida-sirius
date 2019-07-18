@@ -25,6 +25,7 @@ from .upf_to_json import upf_to_json
 SiriusParameters = DataFactory('sirius.scf')
 SinglefileData = DataFactory('singlefile')
 KpointsData = DataFactory('array.kpoints')
+Dict = DataFactory('dict')
 
 SIRIUS_JSON = {
     "control": {
@@ -125,7 +126,9 @@ class SiriusBaseCalculation(CalcJob):
         spec.input_namespace('pseudos', valid_type=UpfData, dynamic=True,
                              help='A mapping of `UpfData` nodes onto the kind name to which they should apply.')
         spec.output('sirius', valid_type=SinglefileData, help='standard output')
+        spec.output('output', valid_type=Dict, help='sirius.scf json output')
         spec.exit_code(100, 'ERROR_MISSING_OUTPUT_FILES', message='Calculation did not produce all expected output files.')
+        spec.exit_code(201, 'ERROR_NOT_CONVERGED', message='Calculation did not converge.')
 
     def _read_pseudos(self, sirius_json):
         # parse pseudos
@@ -160,7 +163,7 @@ class SiriusSCFCalculation(SiriusBaseCalculation):
         """
         codeinfo = datastructures.CodeInfo()
         output_filename = self.metadata.options.output_filename
-        codeinfo.cmdline_params = ['--output=%s' % output_filename]
+        codeinfo.cmdline_params = ['--output=output.json']
         codeinfo.code_uuid = self.inputs.code.uuid
         codeinfo.stdout_name = self.metadata.options.output_filename
         codeinfo.withmpi = self.inputs.metadata.options.withmpi
@@ -185,6 +188,6 @@ class SiriusSCFCalculation(SiriusBaseCalculation):
         calcinfo.local_copy_list = [
             (sirius_config.uuid, sirius_config.filename, 'sirius.json')
         ]
-        calcinfo.retrieve_list = [self.metadata.options.output_filename]
+        calcinfo.retrieve_list = [self.metadata.options.output_filename, 'output.json']
 
         return calcinfo

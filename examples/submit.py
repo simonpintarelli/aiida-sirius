@@ -25,7 +25,7 @@ params = {
         "num_mag_dims": 1,
         "gk_cutoff": 6.0,
         "pw_cutoff": 27.00,
-        "num_dft_iter": 100
+        "num_dft_iter": 2
 }
 # Prepare input parameters
 SiriusParameters = DataFactory('sirius.scf')
