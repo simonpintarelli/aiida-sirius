@@ -118,7 +118,7 @@ class SiriusBaseCalculation(CalcJob):
         super(SiriusBaseCalculation, cls).define(spec)
         spec.input('metadata.options.resources', valid_type=dict, default={'num_machines': 1, 'num_mpiprocs_per_machine': 1})
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.scf')
-        spec.input('metadata.options.output_filename', valid_type=six.string_types, default='output.json')
+        spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.scf.out')
         spec.input('structure', valid_type=StructureData, help='The input structure')
         spec.input('kpoints', valid_type=KpointsData, help='kpoints')
         spec.input('sirius_config', valid_type=SiriusParameters, help='sirius parameters')
