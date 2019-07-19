@@ -21,12 +21,15 @@
     "entry_points": {
         "aiida.data": [
             "sirius.scf = aiida_sirius.data:SiriusParameters"
+            "nlcg = aiida_sirius.data.nlcg:NLCGParameters"
         ],
         "aiida.calculations": [
             "sirius.scf = aiida_sirius.calculations.scf_base:SiriusSCFCalculation"
+            "nlcg = aiida_sirius.calculations.nlcg:NLCGCalculation"
         ],
         "aiida.parsers": [
-            "sirius.scf = aiida_sirius.parsers:SiriusSCFParser"
+            "sirius.scf = aiida_sirius.parsers.scf:SiriusSCFParser"
+            "nlcg = aiida_sirius.parsers.nlcg:NLCGParser"
         ]
     },
     "include_package_data": true,

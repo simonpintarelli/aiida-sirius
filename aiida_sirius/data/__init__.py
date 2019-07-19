@@ -68,10 +68,9 @@ sirius_options = {
 
 class SiriusParameters(Dict):
     """
-    Command line options for diff.
+    Command line options for sirius.scf.
 
-    This class represents a python dictionary used to
-    pass command line options to the executable.
+    This class represents a python dictionary equivalent to the sirius.json file.
     """
 
     # "voluptuous" schema  to add automatic validation
@@ -82,11 +81,9 @@ class SiriusParameters(Dict):
         """
         Constructor for the data class
 
-        Usage: ``SiriusParameters(dict{'ignore-case': True})``
+        Usage: ``SiriusParameters(dict=params)``
 
-        :param parameters_dict: dictionary with commandline parameters
-        :param type parameters_dict: dict
-
+        :param params: dictionary with sirius.json
         """
         dict = self.validate(dict)
         super(SiriusParameters, self).__init__(dict=dict, **kwargs)
@@ -107,12 +104,6 @@ class SiriusParameters(Dict):
 
     def __str__(self):
         """String representation of node.
-
-        Append values of dictionary to usual representation. E.g.::
-
-            uuid: b416cbee-24e8-47a8-8c11-6d668770158b (pk: 590)
-            {'ignore-case': True}
-
         """
         string = super(SiriusParameters, self).__str__()
         string += "\n" + str(self.get_dict())
