@@ -1,19 +1,15 @@
-[![Build Status](https://travis-ci.org/simonpintarelli/aiida-sirius.svg?branch=master)](https://travis-ci.org/simonpintarelli/aiida-sirius)
-[![Coverage Status](https://coveralls.io/repos/github/simonpintarelli/aiida-sirius/badge.svg?branch=master)](https://coveralls.io/github/simonpintarelli/aiida-sirius?branch=master)
-[![Docs status](https://readthedocs.org/projects/aiida-sirius/badge)](http://aiida-sirius.readthedocs.io/)
-[![PyPI version](https://badge.fury.io/py/aiida-sirius.svg)](https://badge.fury.io/py/aiida-sirius)
+<!-- [![Build Status](https://travis-ci.org/simonpintarelli/aiida-sirius.svg?branch=master)](https://travis-ci.org/simonpintarelli/aiida-sirius) -->
+<!-- [![Coverage Status](https://coveralls.io/repos/github/simonpintarelli/aiida-sirius/badge.svg?branch=master)](https://coveralls.io/github/simonpintarelli/aiida-sirius?branch=master) -->
+<!-- [![Docs status](https://readthedocs.org/projects/aiida-sirius/badge)](http://aiida-sirius.readthedocs.io/) -->
+<!-- [![PyPI version](https://badge.fury.io/py/aiida-sirius.svg)](https://badge.fury.io/py/aiida-sirius) -->
 
 # aiida-sirius
 
-AiiDA plugin for the SIRIUS library
-
-This plugin is the default output of the
-[AiiDA plugin cutter](https://github.com/aiidateam/aiida-plugin-cutter),
-intended to help developers get started with their AiiDA plugins.
+AiiDA plugin for the SIRIUS library.
 
 ## Features
 
-TODO
+TODO Error reporting
 
 ## Installation
 
