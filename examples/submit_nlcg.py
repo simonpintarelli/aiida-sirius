@@ -40,18 +40,19 @@ SinglefileData = DataFactory('singlefile')
 NLCGParameters = DataFactory('sirius.nlcg')
 nlcg_marzari = {'type': 'Marzari', 'inner': 2, 'fd_slope_check': False}
 precond = {'type': 'kinetic', 'eps': 0.001}
-nlcgconfig = {'CG': {'method': nlcg_marzari,
-                      'type': 'FR',
-                      'maxiter': 5,
-                      'restart': 20,
-                      'tau': 0.1,
-                      'nscf': 1,
-                      'precond': precond,
-                      'tol': 1e-09},
-               'System': {
-                   'T': 300.,
-                   'smearing': 'gaussian-spline'
-               }}
+nlcgconfig = {
+    "CG": {
+        "method": nlcg_marzari,
+        "type": "FR",
+        "maxiter": 5,
+        "restart": 20,
+        "tau": 0.1,
+        "nscf": 1,
+        "precond": precond,
+        "tol": 1e-09,
+    },
+    "System": {"T": 300.0, "smearing": "gaussian-spline"},
+}
 nlcgparams = NLCGParameters(nlcgconfig)
 
 
@@ -70,6 +71,11 @@ s.append_atom(position=(0.,alat/2.,alat/2.),symbols='O')
 kpoints = KpointsData()
 kpoints.set_kpoints_mesh([2, 2, 2])
 
+comp_resources = {'num_mpiprocs_per_machine': 1,
+                  'num_machines': 1,
+                  'num_cores_per_machine': 1,
+                  'num_cores_per_mpiproc': 1}
+
 # set up calculation
 inputs = {
     'code': code,
@@ -79,6 +85,9 @@ inputs = {
     'nlcgparams': nlcgparams,
     'metadata': {
         'description': "Test job submission with the aiida_sirius plugin",
+        'options': {
+            'resources': comp_resources
+        }
     },
     'pseudos': get_pseudos_from_structure(s, 'normcons')
 }
