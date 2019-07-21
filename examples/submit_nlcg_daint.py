@@ -9,13 +9,15 @@ from __future__ import print_function
 import os
 from aiida_sirius import tests, helpers
 from aiida.plugins import DataFactory, CalculationFactory
-from aiida.engine import run
+from aiida.engine import run, submit
 from aiida.orm.nodes.data.upf import get_pseudos_from_structure
+from aiida.orm import Code
 import json
 
 # get code
-computer = helpers.get_computer('localhost')
-code = helpers.get_code(entry_point='sirius.nlcg', computer=computer)
+computer = helpers.get_computer('daint-gpu')
+# code = helpers.get_code(entry_point='sirius.nlcg', computer=computer)
+code = Code.get_from_string('sirius.nlcg@' + computer.get_name())
 
 params = {
         "electronic_structure_method": "pseudopotential",
@@ -71,9 +73,10 @@ s.append_atom(position=(0.,alat/2.,alat/2.),symbols='O')
 kpoints = KpointsData()
 kpoints.set_kpoints_mesh([2, 2, 2])
 
+# 'num_cores_per_machine': 1,
 comp_resources = {'num_mpiprocs_per_machine': 2,
                   'num_machines': 1,
-                  'num_cores_per_mpiproc': 1}
+                  'num_cores_per_mpiproc': 6}
 
 # set up calculation
 inputs = {
@@ -86,8 +89,8 @@ inputs = {
         'description': "Test job submission with the aiida_sirius plugin",
         'options': {
             'resources': comp_resources,
-            'max_wallclock_seconds': 100,
-            'withmpi': True
+            'withmpi': True,
+            'max_wallclock_seconds': 200
         }
     },
     'pseudos': get_pseudos_from_structure(s, 'normcons')
@@ -97,4 +100,4 @@ inputs = {
 # from aiida.engine import submit
 # future = submit(CalculationFactory('sirius'), **inputs)
 calc = CalculationFactory('sirius.nlcg')
-result = run(calc, **inputs)
+result = submit(calc, **inputs)
