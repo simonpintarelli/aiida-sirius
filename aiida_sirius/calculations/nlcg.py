@@ -8,17 +8,17 @@ import six
 
 NLCGParameters = DataFactory('sirius.nlcg')
 SinglefileData = DataFactory('singlefile')
+ArrayData = DataFactory('array')
 
 class NLCGCalculation(SiriusBaseCalculation):
     @classmethod
     def define(cls, spec):
-        print('define')
         super(NLCGCalculation, cls).define(spec)
         spec.input('nlcgparams', valid_type=NLCGParameters, help='NLCG Parameters')
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.nlcg')
         spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.nlcg.out')
         spec.output('nlcg', valid_type=SinglefileData)
-        print('define done')
+        spec.output('cg_history', valid_type=ArrayData)
 
     def prepare_for_submission(self, folder):
         """

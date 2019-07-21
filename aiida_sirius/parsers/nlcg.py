@@ -9,10 +9,13 @@ from __future__ import absolute_import
 from aiida.engine import ExitCode
 from aiida.parsers.parser import Parser
 from aiida.plugins import CalculationFactory, DataFactory
+
+import numpy as np
 import json
 
 NLCGCalculation = CalculationFactory('sirius.nlcg')
 Dict = DataFactory('dict')
+Array = DataFactory('array')
 
 
 def parse_cg_history(fh):
@@ -92,10 +95,12 @@ class NLCGParser(Parser):
             # output_node.store()
         with self.retrieved.open(output_filename, 'r') as handle:
             cg_history = parse_cg_history(handle)
-        print('lenght cg_history:', len(cg_history))
-        print('cg history elem:', cg_history[0])
+
+        cg_history = np.array(cg_history)
+        cg_history_node = Array()
+        cg_history_node.set_array('cg_history', array=cg_history)
 
         self.out('nlcg', output_node)
-
+        self.out('cg_history', cg_history_node)
 
         return ExitCode(0)
