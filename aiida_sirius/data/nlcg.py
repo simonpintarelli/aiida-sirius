@@ -2,7 +2,7 @@ from voluptuous import Optional, Schema, Any
 
 from aiida.orm import Dict
 
-def get_nlcg_scheme():
+def get_nlcg_schema():
     """Using voluptuous to make sure that the config is valid and
     populate missing entries by their default values.
     """
@@ -19,14 +19,19 @@ def get_nlcg_scheme():
                Optional('fd_slope_check', default=False): bool}
     neugebaur = {Required('type'): Any('Neugebaur'), Optional('kappa', default=0.3): float}
 
-    cg = {Required('method'): Any(marzari, neugebaur),
-          Optional('type', default='FR'): Any('FR', 'PR'),
-          Optional('tol', default=1e-9): float,
-          Optional('maxiter', default=300): int,
-          Optional('restart', default=20): int,
-          Optional('nscf', default=4): int,
-          Optional('tau', default=0.1): float,
-          Optional('precond'): precond}
+    cg = {Required('CG'): {Required('method'): Any(marzari, neugebaur),
+                 Optional('type', default='FR'): Any('FR', 'PR'),
+                 Optional('tol', default=1e-9): float,
+                 Optional('maxiter', default=300): int,
+                 Optional('restart', default=20): int,
+                 Optional('nscf', default=4): int,
+                 Optional('tau', default=0.1): float,
+                 Optional('precond'): precond},
+          Required('System'): {
+              Required('T', default=300): float,
+              Required('smearing', default='fermi-dirac'): Any('fermi-diarc', 'gaussian-spline')
+          }
+    }
 
     return Schema(cg)
 
@@ -36,7 +41,7 @@ class NLCGParameters(Dict):
     yaml config for nlcg.py
     """
 
-    schema = get_nlcg_scheme()
+    schema = get_nlcg_schema()
 
     # pylint: disable=redefined-builtin
     def __init__(self, dict=None, **kwargs):

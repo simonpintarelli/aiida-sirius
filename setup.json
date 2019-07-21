@@ -20,16 +20,16 @@
     "version": "0.1.0a0",
     "entry_points": {
         "aiida.data": [
-            "sirius.scf = aiida_sirius.data:SiriusParameters"
-            "nlcg = aiida_sirius.data.nlcg:NLCGParameters"
+            "sirius.scf = aiida_sirius.data:SiriusParameters",
+            "sirius.nlcg = aiida_sirius.data.nlcg:NLCGParameters"
         ],
         "aiida.calculations": [
-            "sirius.scf = aiida_sirius.calculations.scf_base:SiriusSCFCalculation"
-            "nlcg = aiida_sirius.calculations.nlcg:NLCGCalculation"
+            "sirius.scf = aiida_sirius.calculations.scf_base:SiriusSCFCalculation",
+            "sirius.nlcg = aiida_sirius.calculations.nlcg:NLCGCalculation"
         ],
         "aiida.parsers": [
-            "sirius.scf = aiida_sirius.parsers.scf:SiriusSCFParser"
-            "nlcg = aiida_sirius.parsers.nlcg:NLCGParser"
+            "sirius.scf = aiida_sirius.parsers.scf:SiriusSCFParser",
+            "sirius.nlcg = aiida_sirius.parsers.nlcg:NLCGParser"
         ]
     },
     "include_package_data": true,
@@ -38,7 +38,8 @@
     "install_requires": [
         "aiida-core>=1.0.0b4,<2.0.0",
         "six",
-        "voluptuous"
+        "voluptuous",
+        "PyYAML"
     ],
     "extras_require": {
         "testing": [

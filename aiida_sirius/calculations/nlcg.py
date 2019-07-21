@@ -4,15 +4,21 @@ from aiida.common import datastructures
 import tempfile
 import json
 import yaml
+import six
 
-NLCGParameters = DataFactory('nlcg')
+NLCGParameters = DataFactory('sirius.nlcg')
 SinglefileData = DataFactory('singlefile')
 
 class NLCGCalculation(SiriusBaseCalculation):
     @classmethod
     def define(cls, spec):
+        print('define')
         super(NLCGCalculation, cls).define(spec)
-        spec.input('NLCGParams', valid_type=NLCGParameters, help='NLCG Parameters')
+        spec.input('nlcgparams', valid_type=NLCGParameters, help='NLCG Parameters')
+        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.nlcg')
+        spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.nlcg.out')
+        spec.output('nlcg', valid_type=SinglefileData)
+        print('define done')
 
     def prepare_for_submission(self, folder):
         """
@@ -25,7 +31,7 @@ class NLCGCalculation(SiriusBaseCalculation):
         codeinfo = datastructures.CodeInfo()
         output_filename = self.metadata.options.output_filename
         # TODO: adpat to NLCG
-        codeinfo.cmdline_params = ['--output=output.json']
+        codeinfo.cmdline_params = ['--input=nlcg.yaml']
         codeinfo.code_uuid = self.inputs.code.uuid
         codeinfo.stdout_name = self.metadata.options.output_filename
         codeinfo.withmpi = self.inputs.metadata.options.withmpi
@@ -45,13 +51,21 @@ class NLCGCalculation(SiriusBaseCalculation):
         sirius_config.store()
 
         # TODO prepare config.yaml for NLCG
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as nlcg_yaml:
+            out = yaml.dump(self.inputs.nlcgparams.get_dict())
+            nlcg_tmpfile_name = nlcg_yaml.name
+            nlcg_yaml.write(out)
+        nlcg_config = SinglefileData(file=nlcg_tmpfile_name)
+        nlcg_config.store()
 
         # Prepare a `CalcInfo` to be returned to the engine
         calcinfo = datastructures.CalcInfo()
         calcinfo.codes_info = [codeinfo]
         calcinfo.local_copy_list = [
-            (sirius_config.uuid, sirius_config.filename, 'sirius.json')
+            (sirius_config.uuid, sirius_config.filename, 'sirius.json'),
+            (nlcg_config.uuid, nlcg_config.filename, 'nlcg.yaml')
+
         ]
-        calcinfo.retrieve_list = [self.metadata.options.output_filename, 'output.json']
+        calcinfo.retrieve_list = [self.metadata.options.output_filename]
 
         return calcinfo

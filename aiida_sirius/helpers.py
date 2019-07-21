@@ -16,6 +16,7 @@ LOCALHOST_NAME = 'localhost-test'
 
 executables = {
     'sirius.scf': 'sirius.scf',
+    'sirius.nlcg': 'nlcg.py',
 }
 
 
@@ -94,7 +95,7 @@ def get_code(entry_point, computer):
                 entry_point, list(executables.keys())))
 
     try:
-        code = Code.get_from_string('{}@{}'.format(executable,
+        code = Code.get_from_string('{}@{}'.format(entry_point,
                                                    computer.get_name()))
     except NotExistent:
         path = get_path_to_executable(executable)

@@ -20,7 +20,7 @@ from aiida.orm import StructureData, UpfData
 from aiida.plugins import DataFactory
 import tempfile
 
-from .upf_to_json import upf_to_json
+from ..upf_to_json import upf_to_json
 
 SiriusParameters = DataFactory('sirius.scf')
 SinglefileData = DataFactory('singlefile')
@@ -118,17 +118,11 @@ class SiriusBaseCalculation(CalcJob):
         # yapf: disable
         super(SiriusBaseCalculation, cls).define(spec)
         spec.input('metadata.options.resources', valid_type=dict, default={'num_machines': 1, 'num_mpiprocs_per_machine': 1})
-        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.scf')
-        spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.scf.out')
         spec.input('structure', valid_type=StructureData, help='The input structure')
         spec.input('kpoints', valid_type=KpointsData, help='kpoints')
         spec.input('sirius_config', valid_type=SiriusParameters, help='sirius parameters')
         spec.input_namespace('pseudos', valid_type=UpfData, dynamic=True,
                              help='A mapping of `UpfData` nodes onto the kind name to which they should apply.')
-        spec.output('sirius', valid_type=SinglefileData, help='standard output')
-        spec.output('output', valid_type=Dict, help='sirius.scf json output')
-        spec.exit_code(100, 'ERROR_MISSING_OUTPUT_FILES', message='Calculation did not produce all expected output files.')
-        spec.exit_code(201, 'ERROR_NOT_CONVERGED', message='Calculation did not converge.')
 
     def _read_pseudos(self, sirius_json):
         # parse pseudos
@@ -152,6 +146,13 @@ class SiriusSCFCalculation(SiriusBaseCalculation):
         """Define inputs and outputs of the calculation."""
         # yapf: disable
         super(SiriusSCFCalculation, cls).define(spec)
+        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.scf')
+        spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.scf.out')
+        spec.output('sirius', valid_type=SinglefileData, help='standard output')
+        spec.output('output', valid_type=Dict, help='sirius.scf json output')
+        spec.exit_code(100, 'ERROR_MISSING_OUTPUT_FILES', message='Calculation did not produce all expected output files.')
+        spec.exit_code(201, 'ERROR_NOT_CONVERGED', message='Calculation did not converge.')
+
 
     def prepare_for_submission(self, folder):
         """

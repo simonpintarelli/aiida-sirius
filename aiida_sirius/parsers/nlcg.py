@@ -11,8 +11,38 @@ from aiida.parsers.parser import Parser
 from aiida.plugins import CalculationFactory, DataFactory
 import json
 
-SiriusCalculation = CalculationFactory('sirius.scf')
+NLCGCalculation = CalculationFactory('sirius.nlcg')
 Dict = DataFactory('dict')
+
+
+def parse_cg_history(fh):
+    """Parse CG history
+
+    Keyword Arguments:
+    fh -- file handle
+
+    Returns:
+    a list of tuples:
+    [e_1, ..., e_N]
+
+    where:
+    e_i = (i, F, resX, resf|eta)
+    """
+    import re
+    # step    24 F: -26.34592024007 res: X,fn -6.84493e-04 -8.38853e-01
+    # step   218 F: -60.51049737235 res: X,eta -4.43797e-12, -3.10230e-1
+    out = []
+    regx='\s*step\s*([0-9]+)\s*F:\s*(.*)res:\s*X,(?:fn|eta)(.*)[,]?\s+(.*)'
+    for line in fh.readlines():
+        # .strip() to remove newlines at the end
+        match = re.match(regx, line.strip())
+        if match:
+            i = int(match.group(1))
+            F = float(match.group(2))
+            resX = float(match.group(3))
+            resf = float(match.group(4))
+            out.append((i, F, resX, resf))
+    return out
 
 
 class NLCGParser(Parser):
@@ -31,7 +61,7 @@ class NLCGParser(Parser):
         """
         from aiida.common import exceptions
         super(NLCGParser, self).__init__(node)
-        if not issubclass(node.process_class, SiriusCalculation):
+        if not issubclass(node.process_class, NLCGCalculation):
             raise exceptions.ParsingError("Can only parse SiriusCalculation")
 
     def parse(self, **kwargs):
@@ -47,7 +77,7 @@ class NLCGParser(Parser):
 
         # Check that folder content is as expected
         files_retrieved = self.retrieved.list_object_names()
-        files_expected = [output_filename, 'output.json']
+        files_expected = [output_filename]
         # Note: set(A) <= set(B) checks whether A is a subset of B
         # this will fail if calcuation did not converge
         if not set(files_expected) <= set(files_retrieved):
@@ -59,13 +89,13 @@ class NLCGParser(Parser):
         self.logger.info("Parsing '{}'".format(output_filename))
         with self.retrieved.open(output_filename, 'rb') as handle:
             output_node = SinglefileData(file=handle)
-        with self.retrieved.open('output.json', 'r') as handle:
-            result_json = json.load(handle)
-        self.out('sirius', output_node)
-        self.out('output', Dict(dict=result_json))
+            # output_node.store()
+        with self.retrieved.open(output_filename, 'r') as handle:
+            cg_history = parse_cg_history(handle)
+        print('lenght cg_history:', len(cg_history))
+        print('cg history elem:', cg_history[0])
 
-        if not result_json['ground_state']['converged']:
-            return self.exit_codes.ERROR_NOT_CONVERGED
+        self.out('nlcg', output_node)
 
 
         return ExitCode(0)
