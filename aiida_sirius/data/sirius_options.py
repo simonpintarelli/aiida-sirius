@@ -9,6 +9,8 @@ sirius_options = {
         Optional("verbosity", default=1): Any(0, 1, 2),
         Optional("num_band_to_print", default=10): int,
         Optional("memory_usage", default="high"): Any("low", "medium", "high"),
+        Optional("std_evp_solver_type", default="lapack"): Any("lapack", "elpa", "scalapack", "magma"),
+        Optional("gen_evp_solver_type", default="lapack"): Any("lapack", "elpa", "scalapack", "magma")
     },
     "parameters": {
         Optional("electronic_structure_method", default="pseudopotential"): Any(
