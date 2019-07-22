@@ -39,7 +39,8 @@ class NLCGCalculation(SiriusBaseCalculation):
         # with config from input
         structure = self.inputs.structure
         kpoints = self.inputs.kpoints
-        sirius_json = make_sirius_json(structure, kpoints)
+        magnetization = self.inputs.magnetization
+        sirius_json = make_sirius_json(structure, kpoints, magnetization)
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as sirius_tmpfile:
             sirius_json = self._read_pseudos(sirius_json)
             sirius_tmpfile_name = sirius_tmpfile.name
