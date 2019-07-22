@@ -66,13 +66,13 @@ SIRIUS_JSON = {
 }
 
 
-def make_sirius_json(structure, kpoints):
+def make_sirius_json(structure, kpoints, magnetization):
     """
     Keyword Arguments:
     structure -- structure
     pseudos   -- dictionary of UpfData
     """
-    sirius_cell, sirius_pos = read_structure(structure)
+    sirius_cell, sirius_pos = read_structure(structure, magnetization.get_dict())
     sirius_json = deepcopy(SIRIUS_JSON)
     sirius_json['unit_cell']['lattice_vectors'] = sirius_cell
     sirius_json['unit_cell']['atom_types'] = list(sirius_pos.keys())
@@ -83,7 +83,7 @@ def make_sirius_json(structure, kpoints):
     return sirius_json
 
 
-def read_structure(structure):
+def read_structure(structure, magnetization):
     """
     Convert obj of type `StructureData` to sirius input format (e.g. a dictionary)
     Return:
@@ -101,7 +101,12 @@ def read_structure(structure):
     for atom_type in atom_types:
         ltypes = list(filter(lambda x: x.kind_name == atom_type, sites))
         lpos = np.array([x.position for x in ltypes]) / bohr_to_ang
-        atomic_coordinates[atom_type] = [list(x) for x in lpos]
+        try:
+            lmag = np.array(magnetization[atom_type])
+        except KeyError:
+            lmag = np.zeros_like(lpos)
+        lpos_with_mag = np.concatenate((lpos, lmag), axis=1)
+        atomic_coordinates[atom_type] = [list(x) for x in lpos_with_mag]
     return cell, atomic_coordinates
 
 
@@ -121,6 +126,7 @@ class SiriusBaseCalculation(CalcJob):
         spec.input('structure', valid_type=StructureData, help='The input structure')
         spec.input('kpoints', valid_type=KpointsData, help='kpoints')
         spec.input('sirius_config', valid_type=SiriusParameters, help='sirius parameters')
+        spec.input('magnetization', valid_type=Dict, default=Dict(dict={}))
         spec.input_namespace('pseudos', valid_type=UpfData, dynamic=True,
                              help='A mapping of `UpfData` nodes onto the kind name to which they should apply.')
 
@@ -172,7 +178,8 @@ class SiriusSCFCalculation(SiriusBaseCalculation):
         # with config from input
         structure = self.inputs.structure
         kpoints = self.inputs.kpoints
-        sirius_json = make_sirius_json(structure, kpoints)
+        magnetization = self.inputs.magnetization
+        sirius_json = make_sirius_json(structure, kpoints, magnetization)
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as sirius_tmpfile:
             sirius_json = self._read_pseudos(sirius_json)
             sirius_tmpfile_name = sirius_tmpfile.name
