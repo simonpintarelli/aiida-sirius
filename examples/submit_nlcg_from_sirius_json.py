@@ -20,7 +20,7 @@ parser.add_argument('--computer', '-c', default='daint-gpu')
 args = parser.parse_args()
 
 # converters sirius_json to aiida provenance input
-from from_sirius import structure_mag_from_sirius_json
+from from_sirius import from_sirius_json
 
 sirius_json = json.load(open('sirius.json', 'r'))
 
@@ -71,19 +71,16 @@ nlcgconfig = {
 }
 nlcgparams = NLCGParameters(nlcgconfig)
 
-structure, magnetization = structure_mag_from_sirius_json(sirius_json)
+structure, magnetization, kpoints = from_sirius_json(sirius_json)
 
 ####################################################
 # # Warning pseudopotentials are taken from aiida! #
 ####################################################
 pseudos = get_pseudos_from_structure(structure, 'normcons')
 
-kpoints = KpointsData()
-kpoints.set_kpoints_mesh([2, 2, 2])
-
 # 'num_cores_per_machine': 1,
 comp_resources = {'num_mpiprocs_per_machine': 2,
-                  'num_machines': 4,
+                  'num_machines': 1,
                   'num_cores_per_mpiproc': 6}
 
 # set up calculation
