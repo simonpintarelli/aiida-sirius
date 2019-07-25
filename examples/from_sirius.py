@@ -54,8 +54,11 @@ def from_sirius_json(sirius_json):
 
     # get kpoints
     kpoints = KpointsData()
-    ngridk = sirius_json['parameters']['ngridk']
-    kpoints.set_kpoints_mesh(ngridk)
+    if 'vk' in sirius_json['parameters']:
+        kpoints.set_kpoints(sirius_json['parameters']['vk'])
+    else:
+        ngridk = sirius_json['parameters']['ngridk']
+        kpoints.set_kpoints_mesh(ngridk)
 
     s = StructureData(cell=to_list(cell_angstrom))
     if 'atom_coordinate_units' in sirius_unit_cell:

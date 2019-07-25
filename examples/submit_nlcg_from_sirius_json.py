@@ -17,6 +17,12 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--computer', '-c', default='daint-gpu')
+parser.add_argument('--nodes', '-N', default=1, type=int)
+parser.add_argument('--ntasks-per-node', '-p', default=1, type=int)
+parser.add_argument('--ntasks-per-core', '-n', default=1, type=int)
+parser.add_argument('--time', '-t', default=60, type=float, help='time in minutes')
+
+
 args = parser.parse_args()
 
 # converters sirius_json to aiida provenance input
@@ -79,9 +85,9 @@ structure, magnetization, kpoints = from_sirius_json(sirius_json)
 pseudos = get_pseudos_from_structure(structure, 'normcons')
 
 # 'num_cores_per_machine': 1,
-comp_resources = {'num_mpiprocs_per_machine': 2,
-                  'num_machines': 1,
-                  'num_cores_per_mpiproc': 6}
+comp_resources = {'num_mpiprocs_per_machine': args.ntasks_per_node,
+                  'num_machines': args.nodes,
+                  'num_cores_per_mpiproc': args.ntasks_per_core}
 
 # set up calculation
 inputs = {
@@ -96,7 +102,7 @@ inputs = {
         'options': {
             'resources': comp_resources,
             'withmpi': True,
-            'max_wallclock_seconds': 200
+            'max_wallclock_seconds': int(args.time * 60)
         }
     },
     'pseudos': pseudos

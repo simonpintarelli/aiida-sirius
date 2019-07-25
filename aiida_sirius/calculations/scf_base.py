@@ -77,8 +77,11 @@ def make_sirius_json(structure, kpoints, magnetization):
     sirius_json['unit_cell']['lattice_vectors'] = sirius_cell
     sirius_json['unit_cell']['atom_types'] = list(sirius_pos.keys())
     sirius_json['unit_cell']['atoms'] = sirius_pos
-    sirius_json['parameters']['ngridk'] = kpoints.attributes['mesh']
-    sirius_json['parameters']['shiftk'] = kpoints.attributes['offset']
+    try:
+        sirius_json['parameters']['ngridk'] = kpoints.attributes['mesh']
+        sirius_json['parameters']['shiftk'] = kpoints.attributes['offset']
+    except KeyError:
+        sirius_json['parameters']['vk'] = [list(x) for x in kpoints.get_kpoints()]
 
     return sirius_json
 
