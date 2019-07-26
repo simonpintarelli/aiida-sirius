@@ -1,9 +1,9 @@
-from voluptuous import Optional, Schema, All, Length, Any
+from voluptuous import Optional, Schema, All, Length, Any, Required
 
 # A subset of sirius.scf's command line options
 sirius_options = {
     "control": {
-        Optional("processing_unit", default="CPU"): Any("CPU", "GPU"),
+        Optional("processing_unit", default="cpu"): Any("cpu", "gpu"),
         Optional("fft_mode", default="serial"): Any("serial", "parallel"),
         Optional("rmt_max", default=2.2): float,
         Optional("verbosity", default=1): Any(0, 1, 2),
@@ -26,8 +26,9 @@ sirius_options = {
         Optional("pw_cutoff", default=20): float,
         Optional("gk_cutoff", default=6): float,
         Optional("num_mag_dims", default=0): Any(0, 1),
-        Optional("ngridk", default=[1, 1, 1]): All([int], Length(min=3, max=3)),
-        Optional("shiftk", default=[0, 0, 0]): All([int], Length(min=3, max=3)),
+        Optional("ngridk"): All([int], Length(min=3, max=3)),
+        Optional("vk"): All([All([float], Length(min=3, max=3))]),
+        Optional("shiftk"): All([float], Length(min=3, max=3)),
         Optional("num_dft_iter", default=100): int,
         Optional("energy_tol", default=1e-5): float,
         Optional("potential_tol", default=1e-5): float,
@@ -42,6 +43,16 @@ sirius_options = {
         Optional("subspace_size", default=4): int,
         Optional("beta", default=0.7): float,
     },
+    "unit_cell" : {
+        Required("lattice_vectors"): All([All([float], Length(min=3, max=3))],
+                                          Length(min=3, max=3)),
+        Optional("lattice_vectors_scale"): float,
+        Required("atom_types"): All([str]),
+        Required("atom_files") : All({str: str}),
+        Optional("atom_coordinate_units"): Any('au', 'A'),
+        Required("atoms"): Any({str: [Any(All([float], Length(min=3, max=3)),
+                                          All([float], Length(min=6, max=6)))]})
+    },
     "iterative_solver": {
         Optional("type", default="davidson"): Any("davidson", "exact"),
         Optional("num_steps", default=10): int,
@@ -51,6 +62,7 @@ sirius_options = {
         Optional("empty_state_tolerance", default=1e-6): float,
         Optional("orthogonalize", default=True): bool,
         Optional("init_subspace", default="lcao"): Any("lcao", "random"),
+        Optional("min_occupancy"): float,
         Optional("converge_by_energy", default=0): Any(0, 1),
     },
 }
