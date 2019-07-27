@@ -40,18 +40,16 @@ class NLCGCalculation(SiriusBaseCalculation):
         structure = self.inputs.structure
         kpoints = self.inputs.kpoints
         magnetization = self.inputs.magnetization
-        sirius_json = make_sirius_json(structure, kpoints, magnetization)
+        # sirius_json = make_sirius_json(self.inputs.sirius_config.get_dict()['parameters'],
+        sirius_json = self.inputs.sirius_config.get_dict()
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as sirius_tmpfile:
+            # insert Pseudopotentials directly into json
             sirius_json = self._read_pseudos(sirius_json)
-            sirius_tmpfile_name = sirius_tmpfile.name
-            # merge with settings given from outside
-            sirius_json = {**sirius_json, **self.inputs.sirius_config.get_dict()}
             # dump to file
             json.dump(sirius_json, sirius_tmpfile)
-        sirius_config = SinglefileData(file=sirius_tmpfile_name)
+        sirius_config = SinglefileData(file=sirius_tmpfile.name)
         sirius_config.store()
-
-        # TODO prepare config.yaml for NLCG
+        # prepare YAML input for NLCG
         with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as nlcg_yaml:
             out = yaml.dump(self.inputs.nlcgparams.get_dict())
             nlcg_tmpfile_name = nlcg_yaml.name

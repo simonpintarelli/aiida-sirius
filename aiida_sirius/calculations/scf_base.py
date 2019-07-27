@@ -27,63 +27,6 @@ SinglefileData = DataFactory('singlefile')
 KpointsData = DataFactory('array.kpoints')
 Dict = DataFactory('dict')
 
-SIRIUS_JSON = {
-    "control": {
-        "processing_unit": "gpu",
-        "std_evp_solver_type": "lapack",
-        "gen_evp_solver_type": "lapack",
-        "verbosity": 1,
-    },
-    "parameters": {
-        "electronic_structure_method": "pseudopotential",
-        "xc_functionals": ["XC_GGA_X_PBE", "XC_GGA_C_PBE"],
-        "smearing_width": 0.025,
-        "use_symmetry": True,
-        "num_mag_dims": '<MISSING>',
-        "gk_cutoff": 6.0,
-        "pw_cutoff": 27.00,
-        "energy_tol": 1e-8,
-        "potential_tol": 1e-8,
-        "num_dft_iter": 100,
-    },
-    "iterative_solver": {
-        "type": "davidson",
-        "min_occupancy": 1e-5
-    },
-    "unit_cell": {
-        "lattice_vectors": [],
-        "atom_coordinate_units": "au",
-        "atom_types": [""],
-        "atom_files": {},
-        "atoms": {
-        }
-    },
-    "mixer": {
-        "beta": "<MISSING>",
-        "type": "broyden1",
-        "max_history": 8
-    }
-}
-
-
-def make_sirius_json(structure, kpoints, magnetization):
-    """
-    Keyword Arguments:
-    structure -- structure
-    pseudos   -- dictionary of UpfData
-    """
-    sirius_cell, sirius_pos = read_structure(structure, magnetization.get_dict())
-    sirius_json = deepcopy(SIRIUS_JSON)
-    sirius_json['unit_cell']['lattice_vectors'] = sirius_cell
-    sirius_json['unit_cell']['atom_types'] = list(sirius_pos.keys())
-    sirius_json['unit_cell']['atoms'] = sirius_pos
-    try:
-        sirius_json['parameters']['ngridk'] = kpoints.attributes['mesh']
-        sirius_json['parameters']['shiftk'] = kpoints.attributes['offset']
-    except KeyError:
-        sirius_json['parameters']['vk'] = [list(x) for x in kpoints.get_kpoints()]
-
-    return sirius_json
 
 
 def read_structure(structure, magnetization):
@@ -111,6 +54,31 @@ def read_structure(structure, magnetization):
         lpos_with_mag = np.concatenate((lpos, lmag), axis=1)
         atomic_coordinates[atom_type] = [list(x) for x in lpos_with_mag]
     return cell, atomic_coordinates
+
+
+def make_sirius_json(parameters, structure, kpoints, magnetization):
+    """
+    Keyword Arguments:
+    structure -- structure
+    pseudos   -- dictionary of UpfData
+    """
+    print('make_sirius_json')
+    sirius_cell, sirius_pos = read_structure(structure, magnetization.get_dict())
+    sirius_json = {'parameters': deepcopy(parameters)}
+    sirius_json['unit_cell']['lattice_vectors'] = sirius_cell
+    sirius_json['unit_cell']['atom_types'] = list(sirius_pos.keys())
+    sirius_json['unit_cell']['atoms'] = sirius_pos
+    print('kpoints.attributes', kpoints.attributes)
+    if 'mesh' in kpoints.attributes:
+        sirius_json['parameters']['ngridk'] = kpoints.attributes['mesh']
+        sirius_json['parameters']['shiftk'] = kpoints.attributes['offset']
+    else:
+        print('setting kpoints as list(list)')
+        print(kpoints.get_kpoints())
+        sirius_json['parameters']['vk'] = [list(x) for x in kpoints.get_kpoints()]
+
+    return sirius_json
+
 
 
 class SiriusBaseCalculation(CalcJob):
@@ -182,7 +150,8 @@ class SiriusSCFCalculation(SiriusBaseCalculation):
         structure = self.inputs.structure
         kpoints = self.inputs.kpoints
         magnetization = self.inputs.magnetization
-        sirius_json = make_sirius_json(structure, kpoints, magnetization)
+        sirius_json = make_sirius_json(self.inputs.sirius_config.get_dict()['parameters'],
+                                       structure, kpoints, magnetization)
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as sirius_tmpfile:
             sirius_json = self._read_pseudos(sirius_json)
             sirius_tmpfile_name = sirius_tmpfile.name
