@@ -35,10 +35,14 @@ def parse_cg_history(fh):
     # step    24 F: -26.34592024007 res: X,fn -6.84493e-04 -8.38853e-01
     # step   218 F: -60.51049737235 res: X,eta -4.43797e-12, -3.10230e-1
     out = []
-    regx='\s*step\s*([0-9]+)\s*F:\s*(.*)res:\s*X,(?:fn|eta)(.*)[,]?\s+(.*)'
+    rgx1 = '\s*step\s*([0-9]+)\s*F:\s*(.*)res:\s*X,(?:fn|eta)\s+([0-9e\+\-\.]+)\s+([0-9.+-e]+)'
+    rgx2 = '\s*step\s*([0-9]+)\s*F:\s*(.*)res:\s*X,(?:fn|eta)\s+([0-9e\+\-\.]+),\s*([0-9.+-e]+)'
+
     for line in fh.readlines():
         # .strip() to remove newlines at the end
-        match = re.match(regx, line.strip())
+        match1 = re.match(rgx1, line.strip())
+        match2 = re.match(rgx2, line.strip())
+        match = match1 or match2
         if match:
             i = int(match.group(1))
             F = float(match.group(2))
