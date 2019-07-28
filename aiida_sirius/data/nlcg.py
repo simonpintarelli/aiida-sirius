@@ -29,7 +29,7 @@ def get_nlcg_schema():
                  Optional('precond'): precond},
           Required('System'): {
               Required('T', default=300): float,
-              Required('smearing', default='fermi-dirac'): Any('fermi-diarc', 'gaussian-spline')
+              Required('smearing', default='fermi-dirac'): Any('fermi-dirac', 'gaussian-spline')
           }
     }
 
