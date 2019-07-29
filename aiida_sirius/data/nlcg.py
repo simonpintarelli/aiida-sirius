@@ -1,4 +1,4 @@
-from voluptuous import Optional, Schema, Any
+from voluptuous import Optional, Schema, Any, Coerce
 
 from aiida.orm import Dict
 
@@ -10,25 +10,25 @@ def get_nlcg_schema():
 
     teter_precond = {Required('type'): Any('teter')}
     kinetic_precond = {Required('type'): Any('kinetic'),
-                       Optional('eps', default=1e-3): float}
+                       Optional('eps', default=1e-3): Coerce(float)}
     identity_precond = {Required('type', default='identity'): Any('identity')}
     precond = Any(identity_precond, kinetic_precond, teter_precond)
 
     marzari = {Required('type'): Any('Marzari'),
                Optional('inner', default=2): int,
                Optional('fd_slope_check', default=False): bool}
-    neugebaur = {Required('type'): Any('Neugebaur'), Optional('kappa', default=0.3): float}
+    neugebaur = {Required('type'): Any('Neugebaur'), Optional('kappa', default=0.3): Coerce(float)}
 
     cg = {Required('CG'): {Required('method'): Any(marzari, neugebaur),
                  Optional('type', default='FR'): Any('FR', 'PR'),
-                 Optional('tol', default=1e-9): float,
+                 Optional('tol', default=1e-9): Coerce(float),
                  Optional('maxiter', default=300): int,
                  Optional('restart', default=20): int,
                  Optional('nscf', default=4): int,
-                 Optional('tau', default=0.1): float,
+                 Optional('tau', default=0.1): Coerce(float),
                  Optional('precond'): precond},
           Required('System'): {
-              Required('T', default=300): float,
+              Required('T', default=300): Coerce(float),
               Required('smearing', default='fermi-dirac'): Any('fermi-dirac', 'gaussian-spline')
           }
     }
