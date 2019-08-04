@@ -20,13 +20,14 @@ def get_nlcg_schema():
     neugebaur = {Required('type'): Any('Neugebaur'), Optional('kappa', default=0.3): Coerce(float)}
 
     cg = {Required('CG'): {Required('method'): Any(marzari, neugebaur),
-                 Optional('type', default='FR'): Any('FR', 'PR'),
-                 Optional('tol', default=1e-9): Coerce(float),
-                 Optional('maxiter', default=300): int,
-                 Optional('restart', default=20): int,
-                 Optional('nscf', default=4): int,
-                 Optional('tau', default=0.1): Coerce(float),
-                 Optional('precond'): precond},
+                           Optional('type', default='FR'): Any('FR', 'PR'),
+                           Optional('tol', default=1e-9): Coerce(float),
+                           Optional('maxiter', default=300): int,
+                           Optional('restart', default=20): int,
+                           Optional('nscf', default=4): int,
+                           Optional('tau', default=0.1): Coerce(float),
+                           Optional('precond'): precond,
+                           Optional('callback_interval', default=50): int},
           Required('System'): {
               Required('T', default=300): Coerce(float),
               Required('smearing', default='fermi-dirac'): Any('fermi-dirac', 'gaussian-spline')
