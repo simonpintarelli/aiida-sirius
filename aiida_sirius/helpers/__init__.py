@@ -12,6 +12,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 import tempfile
 
+from .pseudos import get_pseudos_from_structure_and_path
+
 LOCALHOST_NAME = 'localhost-test'
 
 executables = {
