@@ -103,18 +103,11 @@ class SiriusBaseCalculation(CalcJob):
 
     def _read_pseudos(self, sirius_json):
         # parse pseudos
-        num_valence_electrons = 0
         for atom_label in self.inputs.pseudos:
             upf = self.inputs.pseudos[atom_label]
             with upf.open() as fh:
                 upf_json = upf_to_json(fh.read(), fname=upf.filename)
-                num_valence_electrons += int(upf_json['pseudo_potential']['header']['z_valence'])
             sirius_json['unit_cell']['atom_files'][atom_label] = json.dumps(upf_json)
-        if 'nbf' in sirius_json['parameters']:
-            nbf = sirius_json['parameters']['nbf']
-        else:
-            nbf = 0.1
-        sirius_json['parameters']['num_fv_states'] = int(np.ceil(num_valence_electrons / 2) + max(10, nbf * num_valence_electrons))
         return sirius_json
 
 
