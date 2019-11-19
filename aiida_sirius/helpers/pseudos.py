@@ -23,7 +23,7 @@ def get_pseudos_from_structure_and_path(structure, path='./'):
                    | set(glob.glob(os.path.join(path, '*Upf'))))
     pseudos = {}
     for pp_file in pseudo_files:
-        upf = UpfData(file=pp_file)
+        upf = UpfData(file=os.path.abspath(pp_file))
         if upf.element in pseudos:
             raise MultipleObjectsError(
                 "More than one UPF for element {} found in "
