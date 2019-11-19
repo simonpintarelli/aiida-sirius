@@ -1,9 +1,9 @@
 from aiida.orm import StructureData, Dict
 from aiida.plugins import DataFactory
-from aiida.common.constants import bohr_to_ang
 import numpy as np
 
 KpointsData = DataFactory('array.kpoints')
+bohr_to_ang = 0.52917720859
 
 def to_list(x):
     return [list(xi) for xi in x]
