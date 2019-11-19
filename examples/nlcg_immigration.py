@@ -24,23 +24,21 @@ import argparse
 import yaml
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--computer', '-c', default='daint-gpu')
 parser.add_argument('--nodes', '-N', default=1, type=int)
 parser.add_argument('--label', default='', type=str)
 parser.add_argument('--desc', default='', type=str)
 parser.add_argument('--ntasks-per-node', '-p', default=1, type=int)
 parser.add_argument('--ntasks-per-core', default=12, type=int)
-parser.add_argument('--pseudos', default='normcons')
 parser.add_argument('--time', '-t', default=60, type=float, help='time in minutes')
 
 args = parser.parse_args()
 
-sirius_json = 'sirius.json'
+sirius_config_fname = 'sirius.json'
 
-assert os.path.exists(sirius_json)
+assert os.path.exists(sirius_config_fname)
 assert os.path.exists('nlcg.yaml')
 # converters sirius_json to aiida provenance input
-irius_json = json.load(open(sirius_json, 'r'))
+sirius_json = json.load(open(sirius_config_fname, 'r'))
 
 # get code
 computer = helpers.get_computer('localhost')
@@ -86,7 +84,7 @@ inputs = {
             'output_filename': 'sirius.nlcg.out',
             'resources': comp_resources,
             'withmpi': True,
-            'max_wallclock_seconds': int(args.time * 60)
+            'max_wallclock_seconds': -1
         },
         'label': args.label
     },
@@ -111,8 +109,9 @@ with computer.get_transport() as transport:
 
     # copy stdout to workdir instead of running the actual calculation
     remote_workdir = calc.node.attributes['remote_workdir']
-    copyfile('sirius.nlcg.out', os.path.join(remote_workdir, 'siroius.nlcg.out'))
+    copyfile('sirius.nlcg.out', os.path.join(remote_workdir, 'sirius.nlcg.out'))
 
+    calc.node.set_state(CalcJobState.RETRIEVING)
     execmanager.retrieve_calculation(calc.node,
                                      transport,
                                      retrieved_temporary_folder=None)
@@ -121,11 +120,3 @@ with computer.get_transport() as transport:
     for out in calc.outputs:
         calc.outputs[out].store()
     calc.kill()
-
-
-# Note: in order to submit your calculation to the aiida daemon, do:
-# from aiida.engine import submit
-# future = submit(CalculationFactory('sirius'), **inputs)
-# calc = CalculationFactory('sirius.nlcg')
-# result = submit(calc, **inputs)
-# print(result.pk)
