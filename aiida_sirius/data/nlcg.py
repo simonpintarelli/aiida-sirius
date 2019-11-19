@@ -1,4 +1,4 @@
-from voluptuous import Optional, Schema, Any, Coerce
+from voluptuous import Optional, Schema, Any, Coerce, Required, Any, Length
 
 from aiida.orm import Dict
 
@@ -6,7 +6,6 @@ def get_nlcg_schema():
     """Using voluptuous to make sure that the config is valid and
     populate missing entries by their default values.
     """
-    from voluptuous import Schema, Optional, Required, Any, Length
 
     teter_precond = {Required('type'): Any('teter')}
     kinetic_precond = {Required('type'): Any('kinetic'),
