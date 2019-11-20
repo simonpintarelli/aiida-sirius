@@ -14,7 +14,7 @@ import numpy as np
 import six
 
 from aiida.common import datastructures
-from aiida.common.constants import bohr_to_ang
+# from aiida.common.constants import bohr_to_ang
 from aiida.engine import CalcJob
 from aiida.orm import StructureData, UpfData
 from aiida.plugins import DataFactory
@@ -27,6 +27,7 @@ SinglefileData = DataFactory('singlefile')
 KpointsData = DataFactory('array.kpoints')
 Dict = DataFactory('dict')
 
+bohr_to_ang = 0.52917720859
 
 
 def read_structure(structure, magnetization):
@@ -80,7 +81,6 @@ def make_sirius_json(parameters, structure, kpoints, magnetization):
     return sirius_json
 
 
-
 class SiriusBaseCalculation(CalcJob):
     """
     AiiDA calculation plugin wrapping the diff executable.
@@ -129,7 +129,6 @@ class SiriusSCFCalculation(SiriusBaseCalculation):
         spec.output('output', valid_type=Dict, help='sirius.scf json output')
         spec.exit_code(100, 'ERROR_MISSING_OUTPUT_FILES', message='Calculation did not produce all expected output files.')
         spec.exit_code(201, 'ERROR_NOT_CONVERGED', message='Calculation did not converge.')
-
 
     def prepare_for_submission(self, folder):
         """
