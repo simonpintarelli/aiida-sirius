@@ -20,6 +20,7 @@ LOCALHOST_NAME = 'localhost-test'
 executables = {
     'sirius.scf': 'sirius.scf',
     'sirius.nlcg': 'nlcg.py',
+    'sirius.md': 'sirius.md'
 }
 
 
