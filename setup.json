@@ -21,15 +21,18 @@
     "entry_points": {
         "aiida.data": [
             "sirius.scf = aiida_sirius.data:SiriusParameters",
-            "sirius.nlcg = aiida_sirius.data.nlcg:NLCGParameters"
+            "sirius.nlcg = aiida_sirius.data.nlcg:NLCGParameters",
+            "sirius.md = aiida_sirius.data:SiriusMDParameters"
         ],
         "aiida.calculations": [
             "sirius.scf = aiida_sirius.calculations.scf_base:SiriusSCFCalculation",
-            "sirius.nlcg = aiida_sirius.calculations.nlcg:NLCGCalculation"
+            "sirius.nlcg = aiida_sirius.calculations.nlcg:NLCGCalculation",
+            "sirius.md = aiida_sirius.calculations.md:SiriusMDCalculation"
         ],
         "aiida.parsers": [
             "sirius.scf = aiida_sirius.parsers.scf:SiriusSCFParser",
-            "sirius.nlcg = aiida_sirius.parsers.nlcg:NLCGParser"
+            "sirius.nlcg = aiida_sirius.parsers.nlcg:NLCGParser",
+            "sirius.md = aiida_sirius.parsers.md:SiriusMDParser"
         ]
     },
     "include_package_data": true,

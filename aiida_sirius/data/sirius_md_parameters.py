@@ -6,11 +6,10 @@ def get_sirius_md_schema():
     """this is for input.yml"""
     kolafa = {Required('type'): Any('kolafa'),
               Required('order'): All(int, Range(min=3, max=20))}
-
     niklasson_wf = {Required('type'): Any('niklasson_wf'),
                     Required('order'): All(int, Range(min=3, max=9))}
-
-    parameters = {Required('method'): Any(kolafa, niklasson_wf),
+    plain = {Required('type'): Any('plain')}
+    parameters = {Required('method', default=plain): Any(kolafa, niklasson_wf, plain),
                   Required('solver'): Any('ot', 'scf'),
                   Optional('maxiter', default=30): All(int, Range(min=1)),
                   Optional('potential_tol', default=1e-6): All(float, Range(min=1e-14)),

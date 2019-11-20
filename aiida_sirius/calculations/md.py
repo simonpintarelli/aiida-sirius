@@ -64,7 +64,7 @@ class SiriusMDCalculation(SiriusBaseCalculation):
         calcinfo.codes_info = [codeinfo]
         calcinfo.local_copy_list = [
             (sirius_config.uuid, sirius_config.filename, 'sirius.json'),
-            (sirius_md_config.uuid, sirius_md_config.filename, 'nlcg.yaml')
+            (sirius_md_config.uuid, sirius_md_config.filename, 'input.yml')
 
         ]
         calcinfo.retrieve_list = [self.metadata.options.output_filename]
