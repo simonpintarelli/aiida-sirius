@@ -26,6 +26,7 @@ sirius_options = {
         Optional("pw_cutoff", default=20): Coerce(float),
         Optional("gk_cutoff", default=6): Coerce(float),
         Optional("nbf"): Coerce(float),
+        Optional("gamma_point", default=False): bool,
         Optional("num_mag_dims", default=0): Any(0, 1),
         Optional("ngridk"): All([int], Length(min=3, max=3)),
         Optional("vk"): All([All([Any(float, int)], Length(min=3, max=3))]),
