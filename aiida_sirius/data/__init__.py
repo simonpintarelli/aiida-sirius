@@ -14,7 +14,8 @@ from voluptuous import Optional, Schema, All, Length, Any
 from aiida.orm import Dict
 
 from .sirius_options import sirius_options
-from .sirius_md_parameters import SiriusMDParameters
+from .md import SiriusMDParameters
+from .nlcg import NLCGParameters
 
 class SiriusParameters(Dict):
     """
