@@ -22,7 +22,7 @@
         "aiida.data": [
             "sirius.scf = aiida_sirius.data:SiriusParameters",
             "sirius.nlcg = aiida_sirius.data.nlcg:NLCGParameters",
-            "sirius.md = aiida_sirius.data:SiriusMDParameters"
+            "sirius.md = aiida_sirius.data.md:SiriusMDParameters"
         ],
         "aiida.calculations": [
             "sirius.scf = aiida_sirius.calculations.scf_base:SiriusSCFCalculation",
