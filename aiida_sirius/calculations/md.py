@@ -15,7 +15,7 @@ class SiriusMDCalculation(SiriusBaseCalculation):
     @classmethod
     def define(cls, spec):
         super(SiriusMDCalculation, cls).define(spec)
-        spec.input('sirius_md_params', valid_type=SiriusMDParameters, help='NLCG Parameters')
+        spec.input('sirius_md_params', valid_type=SiriusMDParameters, help='MD Parameters')
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.md')
         spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.md.out')
         spec.output('md', valid_type=SinglefileData)
@@ -53,7 +53,7 @@ class SiriusMDCalculation(SiriusBaseCalculation):
         sirius_config.store()
         # prepare YAML input for NLCG
         with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as sirius_md_yaml:
-            out = yaml.dump(self.inputs.nlcgparams.get_dict())
+            out = yaml.dump({'parameters': self.inputs.sirius_md_params.get_dict()})
             md_tmpfile_name = sirius_md_yaml.name
             sirius_md_yaml.write(out)
         sirius_md_config = SinglefileData(file=md_tmpfile_name)
@@ -67,6 +67,6 @@ class SiriusMDCalculation(SiriusBaseCalculation):
             (sirius_md_config.uuid, sirius_md_config.filename, 'input.yml')
 
         ]
-        calcinfo.retrieve_list = [self.metadata.options.output_filename]
+        calcinfo.retrieve_list = [self.metadata.options.output_filename, 'md_results.json']
 
         return calcinfo
