@@ -19,7 +19,7 @@ class SiriusMDCalculation(SiriusBaseCalculation):
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.md')
         spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.md.out')
         spec.output('md', valid_type=SinglefileData)
-        spec.output('md_history', valid_type=List)
+        spec.output('md_results', valid_type=List)
 
     def prepare_for_submission(self, folder):
         """
