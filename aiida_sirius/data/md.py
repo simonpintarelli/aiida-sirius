@@ -10,7 +10,7 @@ def get_sirius_md_schema():
                     Required('order'): All(int, Range(min=3, max=9))}
     plain = {Required('type'): Any('plain')}
     parameters = {Required('method', default=plain): Any(kolafa, niklasson_wf, plain),
-                  Required('solver'): Any('ot', 'scf'),
+                  Required('solver'): Any('ot', 'scf', 'mvp2'),
                   Optional('maxiter', default=30): All(int, Range(min=1)),
                   Optional('potential_tol', default=1e-6): All(float, Range(min=1e-14)),
                   Optional('energy_tol', default=1e-6): All(float, Range(min=1e-14)),
