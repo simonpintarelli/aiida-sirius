@@ -6,7 +6,6 @@ Register calculations via the "aiida.calculations" entry point in setup.json.
 from __future__ import absolute_import
 
 import json
-import os
 import tempfile
 from copy import deepcopy
 
@@ -18,7 +17,6 @@ from aiida.common import datastructures
 from aiida.engine import CalcJob
 from aiida.orm import StructureData, UpfData
 from aiida.plugins import DataFactory
-import tempfile
 
 from ..upf_to_json import upf_to_json
 
@@ -27,7 +25,8 @@ SinglefileData = DataFactory('singlefile')
 KpointsData = DataFactory('array.kpoints')
 Dict = DataFactory('dict')
 
-bohr_to_ang = 0.52917720859
+# CODATA 2018
+bohr_to_ang = 0.529177210903
 
 
 def read_structure(structure, magnetization):
