@@ -42,8 +42,8 @@ sirius_json = json.load(open(sirius_config_fname, 'r'))
 
 # get code
 computer = helpers.get_computer('localhost')
-# code = helpers.get_code(entry_point='sirius.nlcg', computer=computer)
-code = Code.get_from_string('sirius.nlcg@' + computer.get_name())
+# code = helpers.get_code(entry_point='sirius.py.nlcg', computer=computer)
+code = Code.get_from_string('sirius.py.nlcg@' + computer.get_name())
 
 ####################
 # # Prepare inputs #
@@ -54,7 +54,7 @@ KpointsData = DataFactory('array.kpoints')
 Dict = DataFactory('dict')
 SinglefileData = DataFactory('singlefile')
 
-NLCGParameters = DataFactory('sirius.nlcg')
+NLCGParameters = DataFactory('sirius.py.nlcg')
 parameters = SiriusParameters(sirius_json)
 nlcgconfig = yaml.load(open('nlcg.yaml', 'r'))
 nlcgconfig = {'System': nlcgconfig['System'],
@@ -81,7 +81,7 @@ inputs = {
     'magnetization': Dict(dict=magnetization),
     'metadata': {
         'options': {
-            'output_filename': 'sirius.nlcg.out',
+            'output_filename': 'sirius.py.nlcg.out',
             'resources': comp_resources,
             'withmpi': True,
             'max_wallclock_seconds': -1
@@ -90,7 +90,7 @@ inputs = {
     },
     'pseudos': pseudos
 }
-nlcgcalc = CalculationFactory('sirius.nlcg')
+nlcgcalc = CalculationFactory('sirius.py.nlcg')
 calc = nlcgcalc(inputs)
 
 with SandboxFolder() as sandbox_folder:
@@ -109,7 +109,7 @@ with computer.get_transport() as transport:
 
     # copy stdout to workdir instead of running the actual calculation
     remote_workdir = calc.node.attributes['remote_workdir']
-    copyfile('sirius.nlcg.out', os.path.join(remote_workdir, 'sirius.nlcg.out'))
+    copyfile('sirius.py.nlcg.out', os.path.join(remote_workdir, 'sirius.py.nlcg.out'))
 
     calc.node.set_state(CalcJobState.RETRIEVING)
     execmanager.retrieve_calculation(calc.node,

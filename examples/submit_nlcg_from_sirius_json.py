@@ -32,8 +32,8 @@ sirius_json = json.load(open('sirius.json', 'r'))
 
 # get code
 computer = helpers.get_computer(args.computer)
-# code = helpers.get_code(entry_point='sirius.nlcg', computer=computer)
-code = Code.get_from_string('sirius.nlcg@' + computer.get_name())
+# code = helpers.get_code(entry_point='sirius.py.nlcg', computer=computer)
+code = Code.get_from_string('sirius.py.nlcg@' + computer.get_name())
 
 params = {
         "electronic_structure_method": "pseudopotential",
@@ -59,7 +59,7 @@ parameters = SiriusParameters({'control': {},
                                'mixer': {}})
 SinglefileData = DataFactory('singlefile')
 
-NLCGParameters = DataFactory('sirius.nlcg')
+NLCGParameters = DataFactory('sirius.py.nlcg')
 nlcg_marzari = {'type': 'Marzari', 'inner': 2, 'fd_slope_check': False}
 precond = {'type': 'kinetic', 'eps': 0.001}
 nlcgconfig = {
@@ -111,5 +111,5 @@ inputs = {
 # Note: in order to submit your calculation to the aiida daemon, do:
 # from aiida.engine import submit
 # future = submit(CalculationFactory('sirius'), **inputs)
-calc = CalculationFactory('sirius.nlcg')
+calc = CalculationFactory('sirius.py.nlcg')
 result = submit(calc, **inputs)

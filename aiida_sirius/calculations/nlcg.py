@@ -6,7 +6,7 @@ import json
 import yaml
 import six
 
-NLCGParameters = DataFactory('sirius.nlcg')
+NLCGParameters = DataFactory('sirius.py.nlcg')
 SinglefileData = DataFactory('singlefile')
 ArrayData = DataFactory('array')
 
@@ -15,8 +15,8 @@ class NLCGCalculation(SiriusBaseCalculation):
     def define(cls, spec):
         super(NLCGCalculation, cls).define(spec)
         spec.input('nlcgparams', valid_type=NLCGParameters, help='NLCG Parameters')
-        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.nlcg')
-        spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.nlcg.out')
+        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='sirius.py.nlcg')
+        spec.input('metadata.options.output_filename', valid_type=six.string_types, default='sirius.py.nlcg.out')
         spec.output('nlcg', valid_type=SinglefileData)
         spec.output('cg_history', valid_type=ArrayData)
 

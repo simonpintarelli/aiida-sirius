@@ -11,6 +11,7 @@ from aiida.parsers.parser import Parser
 from aiida.plugins import CalculationFactory, DataFactory
 
 import numpy as np
+import re
 import json
 
 NLCGCalculation = CalculationFactory('sirius.nlcg')
@@ -31,7 +32,6 @@ def parse_cg_history(fh):
     where:
     e_i = (i, F, resX, resf|eta)
     """
-    import re
     # step    24 F: -26.34592024007 res: X,fn -6.84493e-04 -8.38853e-01
     # step   218 F: -60.51049737235 res: X,eta -4.43797e-12, -3.10230e-1
     out = []
@@ -54,7 +54,7 @@ def parse_cg_history(fh):
 
 class NLCGParser(Parser):
     """
-    Parser class for parsing output of calculation.
+    Parser class for parsing output of calculation (Python).
     """
 
     def __init__(self, node):

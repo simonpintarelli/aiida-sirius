@@ -1,4 +1,4 @@
-from voluptuous import Optional, Schema, All, Length, Any, Required, Coerce
+from voluptuous import Optional, All, Length, Any, Required, Coerce, Range
 
 # A subset of sirius.scf's command line options
 sirius_options = {
@@ -9,8 +9,20 @@ sirius_options = {
         Optional("verbosity", default=1): Any(0, 1, 2),
         Optional("num_band_to_print", default=10): int,
         Optional("memory_usage", default="high"): Any("low", "medium", "high"),
-        Optional("std_evp_solver_type", default="lapack"): Any("lapack", "elpa", "scalapack", "magma"),
-        Optional("gen_evp_solver_type", default="lapack"): Any("lapack", "elpa", "scalapack", "magma")
+        Optional("std_evp_solver_type", default="lapack"): Any(
+            "lapack", "elpa", "scalapack", "magma"
+        ),
+        Optional("gen_evp_solver_type", default="lapack"): Any(
+            "lapack", "elpa", "scalapack", "magma"
+        ),
+    },
+    "nlcg": {
+        Optional("processing_unit", default=""): Any("", "cpu", "gpu"),
+        Optional("T", default=300): Coerce(float),
+        Optional("smearing", default="FD"): Any("FD", "GS"),
+        Optional("tol", default=1e-9): Coerce(float),
+        Optional("restart", default=10): All([int], Range(min=1)),
+        Optional("maxiter", default=300): All([int], Range(min=0)),
     },
     "parameters": {
         Optional("electronic_structure_method", default="pseudopotential"): Any(
@@ -45,15 +57,24 @@ sirius_options = {
         Optional("subspace_size", default=4): int,
         Optional("beta", default=0.7): Coerce(float),
     },
-    "unit_cell" : {
-        Required("lattice_vectors"): All([All([Coerce(float)], Length(min=3, max=3))],
-                                          Length(min=3, max=3)),
+    "unit_cell": {
+        Required("lattice_vectors"): All(
+            [All([Coerce(float)], Length(min=3, max=3))], Length(min=3, max=3)
+        ),
         Optional("lattice_vectors_scale"): Any(float, int),
         Required("atom_types"): All([str]),
-        Required("atom_files") : All({str: str}),
-        Optional("atom_coordinate_units"): Any('au', 'A'),
-        Required("atoms"): Any({str: [Any(All([Any(float, int)], Length(min=3, max=3)),
-                                          All([Any(float, int)], Length(min=6, max=6)))]})
+        Required("atom_files"): All({str: str}),
+        Optional("atom_coordinate_units"): Any("au", "A"),
+        Required("atoms"): Any(
+            {
+                str: [
+                    Any(
+                        All([Any(float, int)], Length(min=3, max=3)),
+                        All([Any(float, int)], Length(min=6, max=6)),
+                    )
+                ]
+            }
+        ),
     },
     "iterative_solver": {
         Optional("type", default="davidson"): Any("davidson", "exact"),

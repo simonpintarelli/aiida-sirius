@@ -40,8 +40,8 @@ sirius_json = json.load(open(sirius_json, 'r'))
 
 # get code
 computer = helpers.get_computer(args.computer)
-# code = helpers.get_code(entry_point='sirius.nlcg', computer=computer)
-code = Code.get_from_string('sirius.nlcg@' + computer.get_name())
+# code = helpers.get_code(entry_point='sirius.py.nlcg', computer=computer)
+code = Code.get_from_string('sirius.py.nlcg@' + computer.get_name())
 
 ####################
 # # Prepare inputs #
@@ -52,7 +52,7 @@ KpointsData = DataFactory('array.kpoints')
 Dict = DataFactory('dict')
 SinglefileData = DataFactory('singlefile')
 
-NLCGParameters = DataFactory('sirius.nlcg')
+NLCGParameters = DataFactory('sirius.py.nlcg')
 parameters = SiriusParameters(sirius_json)
 nlcgconfig = yaml.load(open('nlcg.yaml', 'r'))
 nlcgconfig = {'System': nlcgconfig['System'],
@@ -91,6 +91,6 @@ inputs = {
 # Note: in order to submit your calculation to the aiida daemon, do:
 # from aiida.engine import submit
 # future = submit(CalculationFactory('sirius'), **inputs)
-calc = CalculationFactory('sirius.nlcg')
+calc = CalculationFactory('sirius.py.nlcg')
 result = submit(calc, **inputs)
 print(result.pk)
