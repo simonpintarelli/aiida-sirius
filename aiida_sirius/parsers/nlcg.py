@@ -12,7 +12,6 @@ from aiida.plugins import CalculationFactory, DataFactory
 
 import numpy as np
 import re
-import json
 
 NLCGCalculation = CalculationFactory('sirius.nlcg')
 Dict = DataFactory('dict')
