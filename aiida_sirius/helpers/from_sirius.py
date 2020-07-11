@@ -3,7 +3,7 @@ from aiida.plugins import DataFactory
 import numpy as np
 
 KpointsData = DataFactory('array.kpoints')
-bohr_to_ang = 0.52917720859
+bohr_to_ang = 0.529177210903
 
 def to_list(x):
     return [list(xi) for xi in x]
