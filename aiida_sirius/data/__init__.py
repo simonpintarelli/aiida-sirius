@@ -18,8 +18,7 @@ from .md import SiriusMDParameters
 from .nlcg import NLCGParameters
 
 class SiriusParameters(Dict):
-    """
-    Command line options for sirius.scf.
+    """Command line options for sirius.scf.
 
     This class represents a python dictionary equivalent to the sirius.json file.
     """

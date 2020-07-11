@@ -27,11 +27,13 @@
         "aiida.calculations": [
             "sirius.scf = aiida_sirius.calculations.scf_base:SiriusSCFCalculation",
             "sirius.py.nlcg = aiida_sirius.calculations.nlcg:NLCGCalculation",
+            "sirius.cpp.nlcg = aiida_sirius.calculations.nlcg_cpp:NLCGCPPCalculation",
             "sirius.md = aiida_sirius.calculations.md:SiriusMDCalculation"
         ],
         "aiida.parsers": [
             "sirius.scf = aiida_sirius.parsers.scf:SiriusSCFParser",
             "sirius.py.nlcg = aiida_sirius.parsers.nlcg:NLCGParser",
+            "sirius.cpp.nlcg = aiida_sirius.parsers.nlcg_cpp:NLCGCPPParser",
             "sirius.md = aiida_sirius.parsers.md:SiriusMDParser"
         ]
     },
