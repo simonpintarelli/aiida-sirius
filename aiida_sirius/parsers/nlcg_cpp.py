@@ -23,15 +23,15 @@ def parse_cg_history(fh):
     """Parse sirius.py.nlcg output
     """
 
-    rgx = '\s*([0-9]+)\s+([0-9]\+\-\.)\s+([0-9]\+\-\.)'
+    rgx = '\s*([0-9]+)\s+([0-9e\+\-\.]+)\s+([0-9e\+\-\.]+)'
     out = []
 
     for line in fh.readlines():
         match = re.match(rgx, line.strip())
         if match:
             i = int(match.group(1))
-            F = int(match.group(2))
-            res = int(match.group(3))
+            F = float(match.group(2))
+            res = float(match.group(3))
             out.append((i, F, res))
     return out
 
@@ -53,7 +53,7 @@ class NLCGCPPParser(Parser):
         from aiida.common import exceptions
         super(NLCGCPPParser, self).__init__(node)
         if not issubclass(node.process_class, NLCGCPPCalculation):
-            raise exceptions.ParsingError("Can only parse SiriusCalculation")
+            raise exceptions.ParsingError("Can only parse NLCGCPPCalculation")
 
     def parse(self, **kwargs):
         """
@@ -82,8 +82,8 @@ class NLCGCPPParser(Parser):
             stdout_node = SinglefileData(file=handle)
 
         self.logger.info("Parsing '{}'".format('nlcg.out'))
-        with self.retrieved.open('nlcg.out', 'rb') as handle:
-            output_node = SinglefileData(file=handle)
+        # with self.retrieved.open('nlcg.out', 'rb') as handle:
+        #     output_node = SinglefileData(file=handle)
 
         with self.retrieved.open('nlcg.out', 'r') as handle:
             cg_history = parse_cg_history(handle)
@@ -92,8 +92,8 @@ class NLCGCPPParser(Parser):
         cg_history_node = Array()
         cg_history_node.set_array('cg_history', array=cg_history)
 
-        self.out('stdout', stdout_node)
-        self.out('nlcg', output_node)
+        # self.out('stdout', stdout_node)
+        self.out('nlcg', stdout_node)
         self.out('cg_history', cg_history_node)
 
         return ExitCode(0)
