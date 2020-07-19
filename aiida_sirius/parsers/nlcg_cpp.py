@@ -14,7 +14,7 @@ import numpy as np
 import re
 import json
 
-NLCGCalculation = CalculationFactory('sirius.py.nlcg')
+NLCGCPPCalculation = CalculationFactory('sirius.cpp.nlcg')
 Dict = DataFactory('dict')
 Array = DataFactory('array')
 
@@ -52,7 +52,7 @@ class NLCGCPPParser(Parser):
         """
         from aiida.common import exceptions
         super(NLCGCPPParser, self).__init__(node)
-        if not issubclass(node.process_class, NLCGCalculation):
+        if not issubclass(node.process_class, NLCGCPPCalculation):
             raise exceptions.ParsingError("Can only parse SiriusCalculation")
 
     def parse(self, **kwargs):

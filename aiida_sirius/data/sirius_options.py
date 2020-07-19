@@ -21,8 +21,10 @@ sirius_options = {
         Optional("T", default=300): Coerce(float),
         Optional("smearing", default="FD"): Any("FD", "GS"),
         Optional("tol", default=1e-9): Coerce(float),
-        Optional("restart", default=10): All([int], Range(min=1)),
-        Optional("maxiter", default=300): All([int], Range(min=0)),
+        Optional("tau", default=0.1): Coerce(float),
+        Optional("kappa", default=0.3): Coerce(float),
+        Optional("restart", default=10): All(int, Range(min=1)),
+        Optional("maxiter", default=300): All(int, Range(min=0)),
     },
     "parameters": {
         Optional("electronic_structure_method", default="pseudopotential"): Any(
