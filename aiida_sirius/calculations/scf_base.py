@@ -58,6 +58,7 @@ def read_structure(structure, magnetization):
 
 def make_sirius_json(parameters, structure, kpoints, magnetization):
     """
+    DEPRECATED
     Keyword Arguments:
     structure -- structure
     pseudos   -- dictionary of UpfData
@@ -76,6 +77,52 @@ def make_sirius_json(parameters, structure, kpoints, magnetization):
         sirius_json['parameters']['vk'] = [list(x) for x in kpoints.get_kpoints()]
 
     return sirius_json
+
+
+def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoints):
+    """
+    Add atoms, lattice vectors, kpoints and magnetization to sirius_params.
+
+    :param sirius_params: sirius json
+    :param structure: aiida structure
+    :param magnetization: {ATOM: [x, y, z]},
+        note magnetization is given as a 3d vector
+    :param kpoints: aiida kpoints
+    """
+    sout = deepcopy(sirius_params)
+
+    # add lattice vectors (unit is bohr)
+    sout['unit_cell']['lattice_vectors'] = [
+        list(x) for x in np.array(structure.attributes['cell']) / bohr_to_ang
+    ]
+    sout['unit_cell']['lattice_vectors_scale'] = 1
+
+    elems = set([site['kind_name'] for site in structure.attributes['sites']])
+
+    sout['unit_cell']['atom_types'] = list(elems)
+    sout['unit_cell']['atom_files'] = {elem: elem + '.json' for elem in elems}
+    sout['unit_cell']['atom_coordinate_units'] = 'au'
+
+    if 'mesh' in kpoints.attributes:
+        sout['parameters']['ngridk'] = kpoints['mesh']
+        sout['parameters']['shiftk'] = kpoints['offset']
+    else:
+        sout['ngridk'] = [list(x) for x in kpoints.get_array('kpoints')]
+
+    for atom_type in elems:
+        angstrom_coords = []
+        for site in filter(lambda x: x['kind_name'] == atom_type,
+                           structure.attributes['sites']):
+            angstrom_coords.append(site['position'])
+
+        frac_coords_magnetization = np.hstack((np.array(angstrom_coords),
+                                               np.array(magnetization[atom_type])))
+
+        sout['unit_cell']['atoms'][atom_type] = [
+            list(x) for x in frac_coords_magnetization
+        ]
+
+    return sout
 
 
 class SiriusBaseCalculation(CalcJob):
