@@ -62,13 +62,11 @@ def make_sirius_json(parameters, structure, kpoints, magnetization):
     structure -- structure
     pseudos   -- dictionary of UpfData
     """
-    print('make_sirius_json')
     sirius_cell, sirius_pos = read_structure(structure, magnetization.get_dict())
     sirius_json = {'parameters': deepcopy(parameters)}
     sirius_json['unit_cell']['lattice_vectors'] = sirius_cell
     sirius_json['unit_cell']['atom_types'] = list(sirius_pos.keys())
     sirius_json['unit_cell']['atoms'] = sirius_pos
-    print('kpoints.attributes', kpoints.attributes)
     if 'mesh' in kpoints.attributes:
         sirius_json['parameters']['ngridk'] = kpoints.attributes['mesh']
         sirius_json['parameters']['shiftk'] = kpoints.attributes['offset']

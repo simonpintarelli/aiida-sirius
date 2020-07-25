@@ -30,7 +30,7 @@ class NLCGCalculation(SiriusBaseCalculation):
         """
         codeinfo = datastructures.CodeInfo()
         output_filename = self.metadata.options.output_filename
-        # TODO: adpat to NLCG
+
         codeinfo.cmdline_params = ['--input=nlcg.yaml']
         codeinfo.code_uuid = self.inputs.code.uuid
         codeinfo.stdout_name = self.metadata.options.output_filename
