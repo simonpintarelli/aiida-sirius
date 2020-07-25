@@ -60,7 +60,7 @@ def from_sirius_json(sirius_json):
         ngridk = sirius_json['parameters']['ngridk']
         kpoints.set_kpoints_mesh(ngridk)
 
-    s = StructureData(cell=to_list(cell_angstrom))
+    structure = StructureData(cell=to_list(cell_angstrom))
     if 'atom_coordinate_units' in sirius_unit_cell:
         if sirius_unit_cell['atom_coordinate_units'] in ['A', 'a.u.', 'au']:
             # atom positions are already given in angstrom, nothing to convert
@@ -68,9 +68,9 @@ def from_sirius_json(sirius_json):
                 for lposmag in sirius_unit_cell['atoms'][atom_type]:
                     lpos = np.array(lposmag[:3])
                     if sirius_unit_cell['atom_coordinate_units'] in ['a.u.', 'au']:
-                        s.append_atom(position=tuple(lpos*bohr_to_ang), symbols=atom_type)
+                        structure.append_atom(position=tuple(lpos*bohr_to_ang), symbols=atom_type)
                     else:
-                        s.append_atom(position=tuple(lpos), symbols=atom_type)
+                        structure.append_atom(position=tuple(lpos), symbols=atom_type)
         else:
             raise ValueError('invalid entry for atom_coordinate_units')
     else:
@@ -79,6 +79,6 @@ def from_sirius_json(sirius_json):
             for lposmag in sirius_unit_cell['atoms'][atom_type]:
                 lpos = np.array(lposmag[:3])
                 apos = np.dot(cell_angstrom.T, lpos)
-                s.append_atom(position=tuple(apos), symbols=atom_type)
+                structure.append_atom(position=tuple(apos), symbols=atom_type)
 
-    return s, magnetization, kpoints
+    return structure, magnetization, kpoints
