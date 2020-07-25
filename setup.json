@@ -38,6 +38,9 @@
             "sirius.nlcg = aiida_sirius.parsers.nlcg:NLCGParser",
             "sirius.cpp.nlcg = aiida_sirius.parsers.nlcg_cpp:NLCGCPPParser",
             "sirius.md = aiida_sirius.parsers.md:SiriusMDParser"
+        ],
+        "aiida.cmdline.data": [
+            "sirius = aiida_sirius.cmd.cmd_sirius_parameters.py:siriusscf"
         ]
     },
     "include_package_data": true,
