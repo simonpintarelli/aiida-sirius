@@ -101,7 +101,7 @@ def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoi
 
     sout['unit_cell']['atom_types'] = list(elems)
     sout['unit_cell']['atom_files'] = {elem: elem + '.json' for elem in elems}
-    sout['unit_cell']['atom_coordinate_units'] = 'au'
+    sout['unit_cell']['atom_coordinate_units'] = 'A'
 
     if 'mesh' in kpoints.attributes:
         sout['parameters']['ngridk'] = kpoints['mesh']
@@ -115,11 +115,11 @@ def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoi
                            structure.attributes['sites']):
             angstrom_coords.append(site['position'])
 
-        frac_coords_magnetization = np.hstack((np.array(angstrom_coords),
-                                               np.array(magnetization[atom_type])))
+        coords_magnetization = np.hstack((np.array(angstrom_coords),
+                                          np.array(magnetization[atom_type])))
 
         sout['unit_cell']['atoms'][atom_type] = [
-            list(x) for x in frac_coords_magnetization
+            list(x) for x in coords_magnetization
         ]
 
     return sout
