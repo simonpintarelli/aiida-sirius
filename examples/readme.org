@@ -2,6 +2,8 @@
 :PROPERTIES:
 :isession: http://127.0.0.100:18888/work/_synced_/aiida/sirius_example/.aiia_sirius_test.ipynb
 :END:
+#+OPTIONS: toc:2          (only include two levels in TOC)
+#+OPTIONS: toc:nil        (no default TOC at all)
 
 
 #+NAME: 83feed3e-4ad7-4d4c-b30e-c074b38747f4
