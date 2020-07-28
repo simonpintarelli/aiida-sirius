@@ -1,14 +1,16 @@
 from .scf_base import SiriusBaseCalculation, add_cell_kpoints_mag_to_sirius
+from ..data.sirius_options import sirius_options
+from voluptuous import Schema
 from aiida.plugins import DataFactory
 from aiida.common import datastructures
 import tempfile
 import json
-import yaml
 import six
 
 NLCGParameters = DataFactory('sirius.py.nlcg')
 SinglefileData = DataFactory('singlefile')
 ArrayData = DataFactory('array')
+
 
 class NLCGCPPCalculation(SiriusBaseCalculation):
     @classmethod
@@ -41,6 +43,8 @@ class NLCGCPPCalculation(SiriusBaseCalculation):
         sirius_json = self.inputs.sirius_config.get_dict()
         sirius_json = add_cell_kpoints_mag_to_sirius(sirius_json, structure,
                                                      magnetization, kpoints)
+        # TODO check schema
+        Schema(sirius_options)(sirius_json)
 
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as sirius_tmpfile:
             # insert Pseudopotentials directly into json

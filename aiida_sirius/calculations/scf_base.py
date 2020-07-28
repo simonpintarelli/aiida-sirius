@@ -63,6 +63,7 @@ def make_sirius_json(parameters, structure, kpoints, magnetization):
     structure -- structure
     pseudos   -- dictionary of UpfData
     """
+    raise Exception('deprecated')
     sirius_cell, sirius_pos = read_structure(structure, magnetization.get_dict())
     sirius_json = {'parameters': deepcopy(parameters)}
     sirius_json['unit_cell']['lattice_vectors'] = sirius_cell
@@ -104,10 +105,10 @@ def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoi
     sout['unit_cell']['atom_coordinate_units'] = 'A'
 
     if 'mesh' in kpoints.attributes:
-        sout['parameters']['ngridk'] = kpoints['mesh']
-        sout['parameters']['shiftk'] = kpoints['offset']
+        sout['parameters']['ngridk'] = kpoints.attributes['mesh']
+        sout['parameters']['shiftk'] = kpoints.attributes['offset']
     else:
-        sout['ngridk'] = [list(x) for x in kpoints.get_array('kpoints')]
+        sout['parameters']['vk'] = [list(x) for x in kpoints.get_array('kpoints')]
 
     for atom_type in elems:
         angstrom_coords = []
@@ -115,8 +116,11 @@ def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoi
                            structure.attributes['sites']):
             angstrom_coords.append(site['position'])
 
-        coords_magnetization = np.hstack((np.array(angstrom_coords),
-                                          np.array(magnetization[atom_type])))
+        if atom_type in dict(magnetization):
+            coords_magnetization = np.hstack((np.array(angstrom_coords),
+                                              np.array(magnetization[atom_type])))
+        else:
+            coords_magnetization = angstrom_coords
 
         sout['unit_cell']['atoms'][atom_type] = [
             list(x) for x in coords_magnetization
