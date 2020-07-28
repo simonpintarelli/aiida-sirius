@@ -132,6 +132,8 @@ Finalize input and dry-run calculation.
   kpoints.set_kpoints_mesh([3, 3, 3])
 
   # note: magnetization is given per atom and not per atom type
+  # in SIRIUS we always set the magnetziation to either -1 or 1. For collinear magnetism only the z-component is used
+  # x and y should be zero.
   magnetization = {'S': [[0, 0, 0]], 'Sm': [[0, 0, 0]]}
   label = 'SmS'
   pseudo_family = 'sg15_pz'
