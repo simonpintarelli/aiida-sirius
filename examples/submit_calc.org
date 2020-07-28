@@ -1,0 +1,193 @@
+* Using the SIRIUS plugin in AiiDA
+:PROPERTIES:
+:isession: http://127.0.0.100:18888/work/_synced_/aiida/sirius_example/.aiia_sirius_test.ipynb
+:END:
+
+
+#+NAME: 83feed3e-4ad7-4d4c-b30e-c074b38747f4
+#+HEADER: :session (org-entry-get nil "isession" 1)
+#+BEGIN_SRC python :exports none :results raw drawer
+import IPython
+
+IPython.Application.instance().kernel.do_shutdown(True) #automatically restarts kernel
+#+END_SRC
+
+
+#+NAME: 273921c1-46e5-4d10-8c24-f867d219f212
+#+HEADER: :session (org-entry-get nil "isession" 1)
+#+BEGIN_SRC python :exports both :results none
+  import aiida
+  from aiida import load_profile
+  load_profile()
+  from aiida.orm import load_node, Node, Group, Computer, User, CalcJobNode, QueryBuilder, Dict, Code
+  from aiida.engine import run, run_get_node, submit
+  from aiida.plugins import CalculationFactory, DataFactory, ParserFactory
+  from aiida.orm.nodes.data.upf import get_pseudos_from_structure
+  from aiida_sirius.data import nlcg
+  from aiida_sirius import tests, helpers
+  import numpy as np
+  from datetime import datetime, timedelta
+  import pandas as pa
+  import matplotlib.pyplot as plt
+  import spglib
+#+END_SRC
+
+#+RESULTS: 273921c1-46e5-4d10-8c24-f867d219f212
+
+Define parameters for =SIRIUS= and =nlcglib=. For the original flavor of the Marzari-Vanderbilt-Payne method we are using Gaussian spline smearing.
+#+NAME: ce667a87-edf5-484b-b592-7120365fab7c
+#+HEADER: :session (org-entry-get nil "isession" 1)
+#+BEGIN_SRC python :exports both :results output :tangle yes
+  pbe_functionals = ["XC_GGA_X_PBE", "XC_GGA_C_PBE"]
+  lda_functionals = ["XC_LDA_X", "XC_LDA_C_PZ"]
+
+  sirius_config = {
+      "control": {
+          "processing_unit": "gpu",
+          "std_evp_solver_type": "lapack",
+          "gen_evp_solver_type": "lapack",
+          "verbosity": 1,
+      },
+      "parameters": {
+          "electronic_structure_method": "pseudopotential",
+          "smearing_width": 0.00095,
+          "xc_functionals": pbe_functionals,
+          "use_symmetry": True,  # use k-point symmetry
+          "num_mag_dims": 1,     # non-magnetic -> 0, collinear magnetism -> 1
+          "gk_cutoff": 6.0,      # wfct cutoff
+          "pw_cutoff": 27.00,    # density cutoff
+          "num_dft_iter": 5,
+      },
+  }
+
+  # Pseudo-Hamiltonian method
+  pseudo_hamiltonian_method = {'type': 'Neugebaur', 'kappa': 0.3}
+
+  # Marzari-Vanderbilt-Payne method
+  mvp_method = {'type': 'Marzari', 'inner': 3}
+
+  nlcg_params = {
+      "System": {"T": 300, "smearing": "gaussian-spline"},
+      "CG": {
+          "method": mvp_method,
+          "type": "FR",
+          "maxiter": 300,
+          "restart": 10,
+          "tau": 0.1,
+          "nscf": 1,
+          "precond": {"type": "teter"},
+          "callback_interval": 10,
+      },
+  }
+#+END_SRC
+
+#+RESULTS: ce667a87-edf5-484b-b592-7120365fab7c
+: [....]
+
+
+Download a structure from materialsproject.org and assemble an AiiDA structure from it.
+#+NAME: ae12306c-931a-4590-b1d4-fb5baf264db2
+#+HEADER: :session (org-entry-get nil "isession" 1)
+#+BEGIN_SRC python :exports both :results raw drawer output
+  from pymatgen import MPRester
+
+  StructureData = DataFactory('structure')
+
+  mp = MPRester()
+  mp_id = 'mp-1269'
+  mp_structure = mp.get_structure_by_material_id(mp_id, final=False)
+  # create aiida structure
+  structure = StructureData(cell=mp_structure.lattice.matrix)
+  for site in mp_structure.sites:
+      structure.append_atom(position=site.coords, symbols=site.specie.value)
+  print(mp_structure)
+#+END_SRC
+
+#+RESULTS: ae12306c-931a-4590-b1d4-fb5baf264db2
+:results:
+Full Formula (Sm1 S1)
+Reduced Formula: SmS
+abc   :   4.221427   4.221427   4.221427
+angles:  60.000000  60.000000  60.000000
+Sites (2)
+  #  SP      a    b    c
+---  ----  ---  ---  ---
+  0  S     0    0    0
+  1  Sm    0.5  0.5  0.5
+:end:
+
+
+Finalize input and dry-run calculation.
+#+NAME: 6a0cf847-a3ab-41e3-98e1-602c1b35a93f
+#+HEADER: :session (org-entry-get nil "isession" 1)
+#+BEGIN_SRC python :exports both :results raw drawer output
+  SiriusParameters = DataFactory('sirius.scf')
+  NLCGCalculation = DataFactory('sirius.py.nlcg')
+  NLCGParameters = DataFactory('sirius.nlcg')
+  KpointsData = DataFactory('array.kpoints')
+
+  kpoints = KpointsData()
+  kpoints.set_kpoints_mesh([3, 3, 3])
+
+  # note: magnetization is given per atom and not per atom type
+  magnetization = {'S': [[0, 0, 0]], 'Sm': [[0, 0, 0]]}
+  label = 'SmS'
+  pseudo_family = 'sg15_pz'
+
+  code_name = "spack-sirius.py.nlcg"
+  computer_name = "daint-gpu"
+  computer = helpers.get_computer(computer_name)
+  code = Code.get_from_string("sirius.nlcg@" + computer.get_name())
+
+  pseudos = get_pseudos_from_structure(structure, pseudo_family)
+
+  comp_resources = {
+      "num_mpiprocs_per_machine": 1,
+      "num_machines": 1,
+      "num_cores_per_mpiproc": 1,
+  }
+  timelimit = 60
+
+  inputs = {
+      "code": code,
+      "sirius_config": SiriusParameters(
+          sirius_config
+      ),
+      "nlcgparams": NLCGParameters(nlcg_params),
+      "structure": structure,
+      "kpoints": kpoints,
+      "magnetization": Dict(dict=magnetization),
+      "metadata": {
+          "dry_run": True,
+          "options": {
+              "resources": comp_resources,
+              "withmpi": True,
+              "max_wallclock_seconds": int(timelimit * 60),
+          },
+          "label": label,
+      },
+      "pseudos": pseudos,
+  }
+
+  calc = CalculationFactory("sirius.py.nlcg")
+  result_and_node = run_get_node(calc, **inputs)
+  node = result_and_node.node
+
+  print("--- dry run info ---")
+  print(node.dry_run_info)
+#+END_SRC
+
+#+RESULTS: 6a0cf847-a3ab-41e3-98e1-602c1b35a93f
+:results:
+--- dry run info ---
+{'folder': '/home/simon/work/_synced_/aiida/sirius_example/submit_test/20200726-00004', 'script_filename': '_aiidasubmit.sh'}
+:end:
+
+
+* Tipps and Tricks
+
+=sirius.json= usually contains only SIRIUS parameters. When using with aiida, the UPF data (in json format) is stored in the same file.
+In order to obtain a human readable =sirius.json= =jq= can be used to filter out the UPF data:
+#+BEGIN_SRC sh
+jq '.unit_cell.atom_files=[]' sirius.json
+#+END_SRC
