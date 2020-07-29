@@ -92,6 +92,7 @@ def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoi
     """
     sout = deepcopy(sirius_params)
 
+    sout['unit_cell'] = {}
     # add lattice vectors (unit is bohr)
     sout['unit_cell']['lattice_vectors'] = [
         list(x) for x in np.array(structure.attributes['cell']) / bohr_to_ang
@@ -122,6 +123,7 @@ def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoi
         else:
             coords_magnetization = angstrom_coords
 
+        sout['unit_cell']['atoms'] = {}
         sout['unit_cell']['atoms'][atom_type] = [
             list(x) for x in coords_magnetization
         ]
