@@ -111,6 +111,7 @@ def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoi
     else:
         sout['parameters']['vk'] = [list(x) for x in kpoints.get_array('kpoints')]
 
+    sout['unit_cell']['atoms'] = {}
     for atom_type in elems:
         angstrom_coords = []
         for site in filter(lambda x: x['kind_name'] == atom_type,
@@ -123,7 +124,6 @@ def add_cell_kpoints_mag_to_sirius(sirius_params, structure, magnetization, kpoi
         else:
             coords_magnetization = angstrom_coords
 
-        sout['unit_cell']['atoms'] = {}
         sout['unit_cell']['atoms'][atom_type] = [
             list(x) for x in coords_magnetization
         ]
