@@ -9,17 +9,17 @@ sirius_options = {
         Optional("verbosity", default=1): Any(0, 1, 2),
         Optional("num_band_to_print", default=10): int,
         Optional("memory_usage", default="high"): Any("low", "medium", "high"),
-        Optional("std_evp_solver_type", default="lapack"): Any(
+        Optional("std_evp_solver_name", default="lapack"): Any(
             "lapack", "elpa", "scalapack", "magma"
         ),
-        Optional("gen_evp_solver_type", default="lapack"): Any(
+        Optional("gen_evp_solver_name", default="lapack"): Any(
             "lapack", "elpa", "scalapack", "magma"
         ),
     },
     "nlcg": {
         Optional("processing_unit", default=""): Any("", "cpu", "gpu"),
         Optional("T", default=300): Coerce(float),
-        Optional("smearing", default="FD"): Any("FD", "GS"),
+        # Optional("smearing", default="FD"): Any("FD", "GS"),
         Optional("tol", default=1e-9): Coerce(float),
         Optional("tau", default=0.1): Coerce(float),
         Optional("kappa", default=0.3): Coerce(float),
@@ -37,6 +37,7 @@ sirius_options = {
         Optional("valence_relativity", default="zora"): Any("zora", "none"),
         Optional("num_fv_states", default=-1): int,
         Optional("smearing_width", default=0.01): Any(float, int),
+        Optional("smearing", default="guasssian"): Any("gaussian", "cold", "fermi-dirac", "gaussian_spline"),
         Optional("pw_cutoff", default=20): Coerce(float),
         Optional("gk_cutoff", default=6): Coerce(float),
         Optional("nbf"): Coerce(float),
@@ -46,8 +47,8 @@ sirius_options = {
         Optional("vk"): All([All([Any(float, int)], Length(min=3, max=3))]),
         Optional("shiftk"): All([Any(float, int)], Length(min=3, max=3)),
         Optional("num_dft_iter", default=100): int,
-        Optional("energy_tol", default=1e-5): Coerce(float),
-        Optional("potential_tol", default=1e-5): Coerce(float),
+        Optional("energy_tol", default=1e-6): Coerce(float),
+        Optional("density_tol", default=1e-6): Coerce(float),
         Optional("molecule", default=False): bool,
         Optional("spin_orbit", default=False): bool,
         Optional("use_symmetry", default=False): bool,
