@@ -10,6 +10,14 @@ def to_list(x):
 
 
 def read_magnetization(unit_cell_atoms):
+    """Extract magnetization dictionary from sirius_json['unit_cell']['atoms'].
+
+    Keyword Arguments:
+    -- unit_cell_atoms: e.g. sirius_json['unit_cell']['atoms']
+
+    Returns:
+    -- magnetization dictionary as used in the provenance of the aiida_sirius plugin
+    """
     def get_mag(pos_mag):
         """
         returns [0, 0, 0] if not specified
@@ -28,7 +36,7 @@ def read_magnetization(unit_cell_atoms):
 
 def from_sirius_json(sirius_json):
     """Create input provenance from sirius_json. Assuming quantities
-    are given in atomic units!
+    are given in atomic units.
 
     Returns structure (unit_cell, sites) and magnetization
 
