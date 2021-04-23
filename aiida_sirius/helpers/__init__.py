@@ -14,6 +14,7 @@ import tempfile
 
 from .pseudos import get_pseudos_from_structure_and_path
 from .from_sirius import from_sirius_json
+from .kpoints  import irreducible_kpoints
 
 LOCALHOST_NAME = 'localhost-test'
 

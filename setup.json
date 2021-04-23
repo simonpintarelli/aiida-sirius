@@ -50,6 +50,7 @@
         "aiida-core>=1.0.0b4,<2.0.0",
         "six",
         "voluptuous",
+        "spglib",
         "PyYAML"
     ],
     "extras_require": {
