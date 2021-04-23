@@ -37,7 +37,7 @@ sirius_options = {
         Optional("valence_relativity", default="zora"): Any("zora", "none"),
         Optional("num_fv_states", default=-1): int,
         Optional("smearing_width", default=0.01): Any(float, int),
-        Optional("smearing", default="guassian"): Any("gaussian", "cold", "fermi-dirac", "gaussian_spline"),
+        Optional("smearing", default="guassian"): Any("gaussian", "cold", "fermi_dirac", "gaussian_spline"),
         Optional("pw_cutoff", default=20): Coerce(float),
         Optional("gk_cutoff", default=6): Coerce(float),
         Optional("nbf"): Coerce(float),
