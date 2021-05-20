@@ -23,7 +23,7 @@ def parse_cg_history(fh):
     """Parse sirius.py.nlcg output
     """
 
-    rgx = '\s*([0-9]+)\s+([0-9e\+\-\.]+)\s+([0-9e\+\-\.]+)'
+    rgx = '\s*([0-9]+)\s+([0-9e\+\-\.]+)\s+([0-9e\+\-\.]+)\s+([0-9e\+\-\.]+)'
     out = []
 
     for line in fh.readlines():
@@ -31,8 +31,9 @@ def parse_cg_history(fh):
         if match:
             i = int(match.group(1))
             F = float(match.group(2))
-            res = float(match.group(3))
-            out.append((i, F, res))
+            res_x = float(match.group(3))
+            res_eta = float(match.group(4))
+            out.append((i, F, res_x, res_eta))
     return out
 
 
