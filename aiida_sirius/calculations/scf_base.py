@@ -46,7 +46,7 @@ def read_structure(structure, magnetization):
     atomic_coordinates = {}
     for atom_type in atom_types:
         ltypes = list(filter(lambda x: x.kind_name == atom_type, sites))
-        lpos = np.array([x.position for x in ltypes]) / bohr_to_ang
+        lpos = np.array([x.position for x in ltypes])
         try:
             lmag = np.array(magnetization[atom_type])
         except KeyError:
@@ -68,6 +68,7 @@ def make_sirius_json(parameters, structure, kpoints, magnetization):
     sirius_json = {'parameters': deepcopy(parameters)}
     sirius_json['unit_cell']['lattice_vectors'] = sirius_cell
     sirius_json['unit_cell']['atom_types'] = list(sirius_pos.keys())
+    sirius_json['unit_cell']['atom_coordinate_units'] = 'A'
     sirius_json['unit_cell']['atoms'] = sirius_pos
     if 'mesh' in kpoints.attributes:
         sirius_json['parameters']['ngridk'] = kpoints.attributes['mesh']
