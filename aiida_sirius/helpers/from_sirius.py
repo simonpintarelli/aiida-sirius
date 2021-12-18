@@ -34,39 +34,22 @@ def read_magnetization(unit_cell_atoms):
     return magnetization
 
 
-def from_sirius_json(sirius_json):
-    """Create input provenance from sirius_json. Assuming quantities
-    are given in atomic units.
-
-    Returns structure (unit_cell, sites) and magnetization
+def sirius_to_aiida_structure(sirius_unit_cell):
+    """Extracts aiida structure from the sirius['unit_cell'] json input.
 
     Keyword Arguments:
-    sirius_json -- sirius_json (as dict)
+    -- sirius_unit_cell: sirius_json['unit_cell'] dictionary
 
     Returns:
-    - StructureData
-    - magnetization dictionary
-    - kpoint
+    -- aiida_structure: object of type `aiida.orm.StructureData`
 
     """
-    sirius_unit_cell = sirius_json['unit_cell']
-
     if 'lattice_vectors_scale' in sirius_unit_cell:
         lattice_vectors_scale = sirius_unit_cell['lattice_vectors_scale']
     else:
         lattice_vectors_scale = 1
 
     cell_angstrom = np.array(sirius_unit_cell['lattice_vectors']) * lattice_vectors_scale * bohr_to_ang
-
-    magnetization = read_magnetization(sirius_unit_cell['atoms'])
-
-    # get kpoints
-    kpoints = KpointsData()
-    if 'vk' in sirius_json['parameters']:
-        kpoints.set_kpoints(sirius_json['parameters']['vk'])
-    else:
-        ngridk = sirius_json['parameters']['ngridk']
-        kpoints.set_kpoints_mesh(ngridk)
 
     structure = StructureData(cell=to_list(cell_angstrom))
     if 'atom_coordinate_units' in sirius_unit_cell:
@@ -88,5 +71,36 @@ def from_sirius_json(sirius_json):
                 lpos = np.array(lposmag[:3])
                 apos = np.dot(cell_angstrom.T, lpos)
                 structure.append_atom(position=tuple(apos), symbols=atom_type)
+    return structure
+
+
+def from_sirius_json(sirius_json):
+    """Create input provenance from sirius_json. Assuming quantities
+    are given in atomic units.
+
+    Returns structure (unit_cell, sites) and magnetization
+
+    Keyword Arguments:
+    sirius_json -- sirius_json (as dict)
+
+    Returns:
+    - StructureData
+    - magnetization dictionary
+    - kpoint
+
+    """
+    sirius_unit_cell = sirius_json['unit_cell']
+
+    magnetization = read_magnetization(sirius_unit_cell['atoms'])
+
+    # get kpoints
+    kpoints = KpointsData()
+    if 'vk' in sirius_json['parameters']:
+        kpoints.set_kpoints(sirius_json['parameters']['vk'])
+    else:
+        ngridk = sirius_json['parameters']['ngridk']
+        kpoints.set_kpoints_mesh(ngridk)
+
+    structure = sirius_to_aiida_structure(sirius_unit_cell)
 
     return structure, magnetization, kpoints
