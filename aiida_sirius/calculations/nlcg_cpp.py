@@ -61,6 +61,6 @@ class NLCGCPPCalculation(SiriusBaseCalculation):
             (sirius_config.uuid, sirius_config.filename, 'sirius.json')
 
         ]
-        calcinfo.retrieve_list = [self.metadata.options.output_filename, 'nlcg.out']
+        calcinfo.retrieve_list = [self.metadata.options.output_filename, 'nlcg.out', 'nlcg.json']
 
         return calcinfo
